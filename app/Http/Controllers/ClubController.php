@@ -14,7 +14,7 @@ class ClubController extends Controller
     public function index()
     {
         $clubs = Club::all();
-        return view('Admin.players' ,['clubs' => $clubs]);
+        return view('Admin.teams' ,['clubs' => $clubs]);
     }
 
     /**

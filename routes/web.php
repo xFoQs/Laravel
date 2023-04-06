@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PlayersController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClubController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,14 +22,15 @@ Route::get('/', function () {
 });
 
 Route::get('login', [AuthController::class, 'index'])->name('login');
-Route::post('post-login', [AuthController::class, 'postLogin'])->name('login.post'); 
+Route::post('post-login', [AuthController::class, 'postLogin'])->name('login.post');
 Route::get('registration', [AuthController::class, 'registration'])->name('register');
-Route::post('post-registration', [AuthController::class, 'postRegistration'])->name('register.post'); 
+Route::post('post-registration', [AuthController::class, 'postRegistration'])->name('register.post');
 
 Route::group(['middleware' => ['auth']], function () {
 
 Route::get('dashboard', [AuthController::class, 'dashboard']);
 Route::get('players', [PlayersController::class, 'index']);
+Route::get('teams', [ClubController::class, 'index']);
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('players',[PlayersController::class, 'store']);
 Route::get('deleted',[PlayersController::class, 'destroy'])->name('player.delete');

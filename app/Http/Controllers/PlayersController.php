@@ -14,14 +14,15 @@ class PlayersController extends Controller
      */
     public function index()
     {
-        $players = Player::all();
+        $players = DB::table('players')
+                    ->join('clubs', 'players.id_club', '=', 'clubs.id')
+                    ->select('players.*', 'clubs.club_name as club_name')
+                    ->get();
         $clubs = Club::all();
         return view('Admin.players' ,['players' => $players, 'clubs' => $clubs]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         return view('players.create');
@@ -37,9 +38,12 @@ class PlayersController extends Controller
         $players->surname = $request->input('surname');
         $players->birthday = $request->input('birthday');
         $players->position = $request->input('position');
-        $players->club = $request->input('club');
+        $clubName = $request->input('club');
+        $club = Club::where('club_name', $clubName)->first();
+        $clubId = $club ? $club->id : null;
+        $players->id_club = $clubId;
         $players->save();
-        
+
         return redirect()->intended('players')->withSuccess('Rekord został dodany pomyślnie');
     }
 
@@ -64,14 +68,17 @@ class PlayersController extends Controller
      */
     public function update(Request $request)
     {
-        
+
     $players = Player::find($request->id);
 
     $players->name = $request->input('e_name');
     $players->surname = $request->input('e_surname');
     $players->birthday = $request->input('e_birthday');
     $players->position = $request->input('e_position');
-    $players->club = $request->input('e_club');
+    $clubName = $request->input('e_club');
+    $club = Club::where('club_name', $clubName)->first();
+    $clubId = $club ? $club->id : null;
+    $players->id_club = $clubId;
 
     $players->save();
 
@@ -82,7 +89,7 @@ class PlayersController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    
+
     public function destroy(Request $id)
     {
         $players = Player::find($id->event_id);

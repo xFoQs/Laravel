@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('surname');
             $table->date('birthday');
             $table->string('position');
-            $table->string('club');
-            
+            $table->integer('id_club');
+
         });
     }
 

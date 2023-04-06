@@ -37,9 +37,9 @@
                         class="nav_logo-name">MatchMaster</span> </a>
                 <div class="nav_list"> <a href="/dashboard" class="nav_link"> <i class='bx bx-grid-alt nav_icon'></i>
                         <span class="nav_name">Dashboard</span> </a> <a href="" class="nav_link active"> <i
-                            class='bx bx-user nav_icon'></i> <span class="nav_name">Users</span> </a> <a href="#"
-                        class="nav_link"> <i class='bx bx-message-square-detail nav_icon'></i> <span
-                            class="nav_name">Messages</span> </a> <a href="#" class="nav_link"> <i
+                            class='bx bx-user nav_icon'></i> <span class="nav_name">Zawodnicy</span> </a> <a href="/teams"
+                        class="nav_link"> <i class='bx bxs-grid nav_icon'></i> <span
+                            class="nav_name">Drużyny</span> </a> <a href="" class="nav_link"> <i
                             class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Bookmark</span> </a> <a
                         href="#" class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span
                             class="nav_name">Files</span> </a>
@@ -54,13 +54,14 @@
     <div id="content" style="padding-top:5rem; height:100%;">
 
         <div class="contenthead" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
-            <h3 style="padding-right:2rem;">Zawodnicy</h3>
+            <h1 style="padding-right:2rem;">Zarządzanie zawodnikami</h1>
 
             <!-- Button trigger modal -->
-            <button type="button" class="btn btn-outline-primary btn-rounded" data-bs-toggle="modal"
-                data-bs-target="#staticBackdrop">
-                Dodaj zawodnika
-            </button>
+
+                <button type="button" class="btn btn-outline-primary btn-rounded" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop" style="height: 45px;width: 170px;">
+                    Dodaj zawodnika
+                </button>
 
 
         </div>
@@ -79,7 +80,7 @@
             <script>
                 Swal.fire(
                     'Gratulacje!',
-                    'Zaaktualizowałeś!',
+                    'Zaaktualizowałeś dane zawodnika!',
                     'success'
                 )
             </script>
@@ -109,7 +110,7 @@
                     <td>{{ $player->surname }}</td>
                     <td>{{ $player->birthday }}</td>
                     <td>{{ $player->position }}</td>
-                    <td>{{ $player->club }}</td>
+                    <td>{{ $player->club_name }}</td>
                     <td>
                         <a data-bs-toggle="modal" data-bs-target="#editplayer{{$player->id}}"><i
                                 class="fa-solid fa-pen-to-square" style="color:#4f4f4f; padding-right: 0.5rem;"></i></a>
@@ -180,8 +181,8 @@
                             <div class="form-outline">
                                 <select name="club" class="form-select" required>
                                     <option value="" disabled selected hidden>Klub</option>
-                                    @foreach ($clubs as $row)
-                                        <option value="{{ $row->name }}">{{ $row->name }}</option>
+                                    @foreach ($clubs as $club)
+                                        <option value="{{ $club->club_name }}">{{ $club->club_name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="invalid-feedback">Klub jest wymagany!</div>
@@ -274,9 +275,9 @@
                        <div class="col-md-6">
                            <div class="form">
                                <select name="e_club" class="form-select" required>
-                                   <option value="{{ $row->name }}" selected hidden>{{$row->name}}</option>
-                                   @foreach ($clubs as $row)
-                                       <option value="{{ $row->name }}">{{ $row->name }}</option>
+                                   <option value="{{ $club->club_name }}" selected hidden>{{$club->club_name}}</option>
+                                   @foreach ($clubs as $club)
+                                       <option value="{{ $club->club_name }}">{{ $club->club_name }}</option>
                                    @endforeach
                                </select>
                                <div class="invalid-feedback">Klub jest wymagany!</div>
@@ -309,7 +310,7 @@
    </div>
    @endforeach
 
-   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
@@ -345,13 +346,13 @@
     <script>
         $(".delete").click(function() {
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                title: 'Jesteś pewny?',
+                text: "Nie będziesz mógł tego cofnąć!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: 'Tal, usuń!'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
@@ -363,7 +364,7 @@
                         },
                         success: function(response) {
                             Swal.fire({
-                                title: "Wizyta usunięta pomyślnie!",
+                                title: "Zawodnik został usunięty!",
                                 text: "Naciśnij przycisk aby przeładować stronę",
                                 icon: "success",
                                 showConfirmButton: true
@@ -372,7 +373,7 @@
                             });
                         },
                         error: function(error) {
-                            Swal.fire('Nie udało sie usunąć wizyty!', '', 'error');
+                            Swal.fire('Nie udało sie usunąć zawodnika!', '', 'error');
                         },
                     })
                 }
