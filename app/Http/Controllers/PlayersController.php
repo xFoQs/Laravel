@@ -69,7 +69,7 @@ class PlayersController extends Controller
     public function update(Request $request)
     {
 
-    $players = Player::find($request->id);
+    $players = Player::findOrFail($request->id);
 
     $players->name = $request->input('e_name');
     $players->surname = $request->input('e_surname');

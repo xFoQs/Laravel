@@ -37,7 +37,7 @@
                         class="nav_logo-name">MatchMaster</span> </a>
                 <div class="nav_list"> <a href="/dashboard" class="nav_link"> <i class='bx bx-grid-alt nav_icon'></i>
                         <span class="nav_name">Dashboard</span> </a> <a href="" class="nav_link active"> <i
-                            class='bx bx-user nav_icon'></i> <span class="nav_name">Zawodnicy</span> </a> <a href="/teams"
+                            class='bx bx-user nav_icon'></i> <span class="nav_name">Zawodnicy</span> </a> <a href="/games"
                         class="nav_link"> <i class='bx bxs-grid nav_icon'></i> <span
                             class="nav_name">Drużyny</span> </a> <a href="" class="nav_link"> <i
                             class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Bookmark</span> </a> <a
@@ -54,7 +54,7 @@
     <div id="content" style="padding-top:5rem; height:100%;">
 
         <div class="contenthead" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
-            <h1 style="padding-right:2rem;">Zarządzanie zawodnikami</h1>
+            <h3 style="padding-right:2rem;">Zawodnicy</h3>
 
             <!-- Button trigger modal -->
 
@@ -105,7 +105,7 @@
         <tbody>
             @foreach ($players as $player)
                 <tr>
-                    <td>{{ $player->id }}</td>
+                    <td>{{ $loop->iteration }}</td>
                     <td>{{ $player->name }}</td>
                     <td>{{ $player->surname }}</td>
                     <td>{{ $player->birthday }}</td>
@@ -228,7 +228,7 @@
                <div class="modal-body">
                    <form class="row gx-3 gy-0 needs-validation" novalidate method="POST" action="{{route('player.update')}}">
                        @csrf
-                       @method('PUT')
+                       @method('POST')
                        <input type="hidden" name="id" value="{{ $player->id }}">
                        <div class="col-md-4">
                            <div class="form">

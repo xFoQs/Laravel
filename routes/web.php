@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PlayersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClubController;
+use App\Http\Controllers\GameController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +36,8 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('players',[PlayersController::class, 'store']);
 Route::get('deleted',[PlayersController::class, 'destroy'])->name('player.delete');
 
-Route::get('update',[PlayersController::class, 'update'])->name('player.update');
+Route::post('update',[PlayersController::class, 'update'])->name('player.update');
 
+Route::get('games', [GameController::class, 'index']);
 });
 

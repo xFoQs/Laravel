@@ -40,7 +40,7 @@
                     <span class="nav_name ">Dashboard</span> </a> <a href="/players" class="nav_link"> <i
                         class='bx bx-user nav_icon'></i> <span class="nav_name">Zawodnicy</span> </a> <a href="#" class="nav_link active">
                     <i class='bx bxs-grid nav_icon'></i> <span
-                        class="nav_name">Drużyny</span> </a> <a href="#" class="nav_link"> <i
+                        class="nav_name">Drużyny</span> </a> <a href="/" class="nav_link"> <i
                         class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Bookmark</span> </a> <a
                     href="#" class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span
                         class="nav_name">Files</span> </a>
@@ -54,8 +54,56 @@
 
 <div id="content" style="padding-top:5rem;">
 
-    <div class="contenthead" style="display:flex; margin-bottom:1rem;">
-        <h3 style="padding-right:2rem;">Zarządzanie drużynami</h3>
+    <div id="content" style="padding-top:5rem; height:100%;">
+
+        <div class="contenthead" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+            <h3 style="padding-right:2rem;">Mecze</h3>
+
+            <!-- Button trigger modal -->
+
+            <button type="button" class="btn btn-outline-primary btn-rounded" data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop" style="height: 45px;width: 170px;">
+                Dodaj Mecz
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+    <br>
+
+    <table id="example" class="table table-striped" style="width:100%">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Club name</th>
+            <th>Club name</th>
+            <th>score1</th>
+            <th>score2</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach ($games as $game)
+            <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $game->club_name }}</td>
+                <td>{{ $game->club_name}}</td>
+                <td>{{ $game->result1 }}</td>
+                <td>{{ $game->result2 }}</td>
+                <td>
+                    <a data-bs-toggle="modal" data-bs-target="#"><i
+                            class="fa-solid fa-pen-to-square" style="color:#4f4f4f; padding-right: 0.5rem;"></i></a>
+                    <a href="#" class="delete" id=""><i class="fa-solid fa-trash"
+                                                                         style="color:#4f4f4f;"></i></a>
+                </td>
+            </tr>
+        @endforeach
+
+        </tbody>
+    </table>
 
 </div>
 

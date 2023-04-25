@@ -1,6 +1,6 @@
 
 document.addEventListener("DOMContentLoaded", function (event) {
-    
+
     const showNavbar = (toggleId, navId, bodyId, headerId) => {
         const toggle = document.getElementById(toggleId),
             nav = document.getElementById(navId),
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 headerpd.classList.toggle("body-pd");
             });
         }
-        
+
     };
 
     showNavbar("header-toggle", "nav-bar", "body-pd", "header");
