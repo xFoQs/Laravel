@@ -11,12 +11,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
+
+
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"rel="stylesheet" />
     <!-- MDB -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -93,7 +97,7 @@
     <table id="example" class="table table-striped" style="width:100%">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>No</th>
                 <th>Name</th>
                 <th>Surname</th>
                 <th>Birthday</th>
@@ -104,13 +108,13 @@
         </thead>
         <tbody>
             @foreach ($players as $player)
-                <tr>
+                <tr data-entry-id="{{ $player->id }}">
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $player->name }}</td>
                     <td>{{ $player->surname }}</td>
-                    <td>{{ $player->birthday }}</td>
+                    <td>{{ $player->birth_date }}</td>
                     <td>{{ $player->position }}</td>
-                    <td>{{ $player->club_name }}</td>
+                    <td>{{ $player->team_name }}</td>
                     <td>
                         <a data-bs-toggle="modal" data-bs-target="#editplayer{{$player->id}}"><i
                                 class="fa-solid fa-pen-to-square" style="color:#4f4f4f; padding-right: 0.5rem;"></i></a>
@@ -133,34 +137,32 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form class="row g-3 needs-validation" novalidate method="POST" action="{{ url('players') }}">
+                    <form class="row g-3"  method="POST" action="{{ route('player.store') }}">
                         @csrf
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" class="form-control" name="name" id="validationCustom01"
+                                <input type="text" class="form-control" name="name"  onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Podaj imię')"
                                     value="" required />
-                                <label for="validationCustom01" class="form-label">First name</label>
-                                <div class="invalid-feedback">Imie jest wymagane!</div>
+                                <label class="form-label">Imię</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" class="form-control" name="surname" id="validationCustom02"
+                                <input type="text" class="form-control" name="surname" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Podaj nazwisko')"
                                     value="" required />
-                                <label for="validationCustom02" class="form-label">Last name</label>
-                                <div class="invalid-feedback">Nazwisko jest wymagane!</div>
+                                <label class="form-label">Nazwisko</label>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="date" class="form-control" name="birthday" value="">
-                                <label for="validationCustom02" class="form-label">Birthday</label>
+                                <input type="date" class="form-control" name="birth_date" value="">
+                                <label for="validationCustom02" class="form-label">Data urodzenia</label>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-outline">
-                                <select name="position" class="form-select" placeholder="Position" required>
-                                    <option value="Pozycja" disabled selected hidden>Pozycja</option>
+                            <div class="form">
+                                <select name="position" class="selectpicker form-control is-valid border rounded" data-width="100%" placeholder="Pozycja">
+
                                     <option value="Napastnik">
                                         Napastnik
                                     </option>
@@ -174,27 +176,22 @@
                                         Bramkarz
                                     </option>
                                 </select>
-                                <div class="invalid-feedback">Klub jest wymagany!</div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="form-outline">
-                                <select name="club" class="form-select" required>
-                                    <option value="" disabled selected hidden>Klub</option>
-                                    @foreach ($clubs as $club)
-                                        <option value="{{ $club->club_name }}">{{ $club->club_name }}</option>
+                            <div class="form">
+                                <select name="team_id" class="form-control selectpicker border rounded border-1" data-live-search="true" data-width="100%" placeholder="Wybierz Klub" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Wybierz Klub')" required>
+                                    @foreach ($teams as $team)
+                                        <option value="{{ $team->name }}" {{ old('team_id') == $team->name ? 'selected' : '' }}>{{ $team->name }}</option>
                                     @endforeach
                                 </select>
-                                <div class="invalid-feedback">Klub jest wymagany!</div>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-12" style="padding-top: 1rem">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" value="" id="invalidCheck"
-                                    required />
+                                    required onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Zatwierdz')"/>
                                 <label class="form-check-label" for="invalidCheck">Zatwierdz</label>
-                                <div class="invalid-feedback">Musisz zatwierdzić dodanie</div>
-
                             </div>
                         </div>
 
@@ -226,21 +223,19 @@
                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body">
-                   <form class="row gx-3 gy-0 needs-validation" novalidate method="POST" action="{{route('player.update')}}">
+                   <form class="row gx-3 gy-0" method="POST" action="{{route('player.update')}}">
                        @csrf
-                       @method('POST')
                        <input type="hidden" name="id" value="{{ $player->id }}">
                        <div class="col-md-4">
                            <div class="form">
-                               <input type="text" class="form-control" name="e_name" id="validationCustom01"
-                                   value="{{$player->name}}" required placeholder="Podaj imię"/>
+                               <input type="text" class="form-control" name="name"
+                                   value="{{$player->name}}" required placeholder="Podaj imię" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Podaj imię')"/>
                                <label for="validationCustom01" class="form-label"></label>
-                               <div class="invalid-feedback">Imie jest wymagane!</div>
                            </div>
                        </div>
                        <div class="col-md-4">
                            <div class="form">
-                               <input type="text" class="form-control" name="e_surname" id="validationCustom02"
+                               <input type="text" class="form-control" name="surname" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Podaj nazwisko')"
                                    value="{{$player->surname}}" required placeholder="Podaj nazwisko"/>
                                <label for="validationCustom02" class="form-label"></label>
                                <div class="invalid-feedback">Nazwisko jest wymagane!</div>
@@ -248,36 +243,34 @@
                        </div>
                        <div class="col-md-4">
                            <div class="form">
-                               <input type="date" class="form-control" name="e_birthday" value="{{$player->birthday}}" placeholder="Podaj datę urodzenia">
-                               <label for="validationCustom02" class="form-label"></label>
+                               <input type="date" class="form-control" name="birth_date" value="{{$player->birth_date}}" placeholder="Podaj datę urodzenia">
+                               <label class="form-label"></label>
                            </div>
                        </div>
                        <div class="col-md-6">
                            <div class="form">
-                               <select name="e_position" class="form-select" placeholder="Pozycja" required>
-                                   <option value="{{$player->position}}" selected hidden>{{$player->position}}</option>
-                                   <option value="Napastnik">
+                               <select name="position" class="selectpicker form-control is-valid border rounded" data-width="100%" placeholder="Pozycja">
+                                   <option value="Napastnik" {{ $player->position == 'Napastnik' ? 'selected' : '' }}>
                                        Napastnik
                                    </option>
-                                   <option value="Pomocnik">
+                                   <option value="Pomocnik" {{ $player->position == 'Pomocnik' ? 'selected' : '' }}>
                                        Pomocnik
                                    </option>
-                                   <option value="Obrońca">
+                                   <option value="Obrońca" {{ $player->position == 'Obrońca' ? 'selected' : '' }}>
                                        Obrońca
                                    </option>
-                                   <option value="Bramkarz">
+                                   <option value="Bramkarz" {{ $player->position == 'Bramkarz' ? 'selected' : '' }}>
                                        Bramkarz
                                    </option>
                                </select>
-                               <div class="invalid-feedback">Klub jest wymagany!</div>
                            </div>
                        </div>
                        <div class="col-md-6">
                            <div class="form">
-                               <select name="e_club" class="form-select" required>
-                                   <option value="{{ $club->club_name }}" selected hidden>{{$club->club_name}}</option>
-                                   @foreach ($clubs as $club)
-                                       <option value="{{ $club->club_name }}">{{ $club->club_name }}</option>
+                               <select name="team_id" class="form-control selectpicker border rounded border-1" data-live-search="true" data-width="100%" placeholder="Wybierz Klub" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Wybierz Klub')" required>
+                                   <option value="{{ $player->team_name }}" selected hidden>{{$player->team_name}}</option>
+                                   @foreach($teams as $team)
+                                       <option value="{{ $team->name }}" {{ $player->team_name == $team->name ? 'selected' : '' }}>{{ $team->name }}</option>
                                    @endforeach
                                </select>
                                <div class="invalid-feedback">Klub jest wymagany!</div>
@@ -286,9 +279,9 @@
                        <div class="col-12">
                            <div class="form-check form-switch" style="padding-top:1rem;">
                                <input class="form-check-input" type="checkbox" value="" id="invalidCheck"
-                                   required />
+                                   required onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Zatwierdz')"/>
                                <label class="form-check-label" for="invalidCheck">Zatwierdz</label>
-                               <div class="invalid-feedback">Musisz zatwierdzić dodanie</div>
+
 
                            </div>
                        </div>
@@ -310,17 +303,27 @@
    </div>
    @endforeach
 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
 
     <script>
         $(document).ready(function() {
             $('#example').DataTable();
         });
     </script>
+
+    <script>
+        $('.selectpicker').selectpicker({
+            style: 'btn-bg: rgba(0,0,0,0)',
+        });
+    </script>
+
 
     <script>
         // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -356,7 +359,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "{{ route('player.delete') }}",
+                        url: "{{ route('player.delete')}}",
                         type: "GET",
                         dataType: 'json',
                         data: {

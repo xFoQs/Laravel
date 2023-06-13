@@ -9,8 +9,9 @@ class Player extends Model
 {
     use HasFactory;
 
-    protected $table = "players";
-    protected $fillable = ["name","surname","birthday","position","club"];
-    protected $primaryKey = "id";
-    public $timestamps = false;
+    protected $guarded = ['id', 'created_at', 'updated_at'];
+
+    public function team(){
+        return $this->belongsTo(Team::class);
+    }
 }
