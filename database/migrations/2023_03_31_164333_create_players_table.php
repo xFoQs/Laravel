@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('surname');
-            $table->date('birthday');
+            $table->date('birth_date')->nullable();
             $table->string('position');
-            $table->integer('id_club');
-
+            $table->integer('team_id');
+            $table->timestamps();
         });
     }
 

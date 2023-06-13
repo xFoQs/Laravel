@@ -23,6 +23,8 @@ Route::get('/', function () {
 
 Route::get('test', [\App\Http\Controllers\GameController::class, 'index'])->name('test');
 Route::get('test2', [\App\Http\Controllers\StandingController::class, 'index'])->name('test2');
+Route::get('test3', [\App\Http\Controllers\PlayerController::class, 'index'])->name('test3');
+
 Route::get('login', [AuthController::class, 'index'])->name('login');
 Route::post('post-login', [AuthController::class, 'postLogin'])->name('login.post');
 Route::get('registration', [AuthController::class, 'registration'])->name('register');

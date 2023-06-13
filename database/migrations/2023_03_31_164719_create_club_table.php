@@ -11,14 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clubs', function (Blueprint $table) {
+        Schema::create('teams', function (Blueprint $table) {
             $table->id();
-            $table->string('club_name');
-            $table->string('league_name');
-            $table->string('owner');
-            $table->date('creation_date');
-            $table->integer('id_stadium');
-
+            $table->string('name');
+            $table->timestamps();
         });
     }
 
