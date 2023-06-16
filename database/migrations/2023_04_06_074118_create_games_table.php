@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('team1_id');
             $table->integer('team2_id');
+            $table->integer('league_id');
             $table->datetime('start_time');
             $table->integer('result1')->nullable();
             $table->integer('result2')->nullable();

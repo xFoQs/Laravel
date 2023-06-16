@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Game;
 use App\Models\Team;
+use App\Models\League;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
@@ -17,9 +18,11 @@ class GameController extends Controller
     public function index(): View
     {
         $games = Game::all();
-        $teams = Team::all()->pluck('name', 'id');
+        $leagues = League::pluck('name','id');
+        $teams = Team::pluck('name', 'id');
 
-        return view('admin.games', compact('games', 'teams'));
+
+        return view('admin.games', compact('games', 'teams', 'leagues'));
     }
 
     public function store(Request $request)
@@ -27,6 +30,7 @@ class GameController extends Controller
         $games = new Game();
         $games->team1_id = $request->input('team1_id');
         $games->team2_id = $request->input('team2_id');
+        $games->league_id = $request->input('league_id');
         $games->start_time = $request->input('start_time');
         $games->result1 = $request->input('result1');
         $games->result2 = $request->input('result2');
@@ -78,4 +82,15 @@ class GameController extends Controller
 
         return response()->noContent();
     }
+
+
+    public function getTeamsByLeague(Request $request)
+    {
+        $leagueId = $request->input('league_id');
+        $teamsInLeague = Team::where('league_id', $leagueId)->get();
+
+        return response()->json($teamsInLeague);
+    }
+
+
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('surname');
             $table->date('birth_date')->nullable();
-            $table->string('position');
+            $table->string('position')->nullable();
             $table->integer('team_id');
             $table->timestamps();
         });

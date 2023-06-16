@@ -32,6 +32,7 @@ Route::post('post-registration', [AuthController::class, 'postRegistration'])->n
 
 Route::group(['middleware' => ['auth']], function () {
 
+
 Route::get('dashboard', [AuthController::class, 'dashboard']);
 
 Route::get('players', [PlayerController::class, 'index']);
@@ -48,6 +49,8 @@ Route::get('/update', [PlayerController::class, 'edit'])->name('player.update');
     Route::get('gameDeleted',[GameController::class, 'destroy'])->name('game.delete');
 
     Route::resource('games', \App\Http\Controllers\Admin\GameController::class);
+
+    Route::get('/get-teams-by-league', [GameController::class, 'getTeamsByLeague'])->name('getTeamsByLeague');
 
 
 
