@@ -188,7 +188,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-12" style="padding-top: 1rem">
+                        <div class="col-12" style="padding-top:1rem">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" value="" id="invalidCheck"
                                     required onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Zatwierdz')"/>
@@ -215,7 +215,7 @@
 
        <!-- Modal -->
        @foreach($players as $player)
-       <div class="modal fade" id="editplayer{{$player->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+       <div class="modal editplayer" id="editplayer{{$player->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" data-player-id="{{$player->id}}"
        aria-labelledby="staticBackdropLabel" aria-hidden="true">
        <div class="modal-dialog modal-dialog-centered modal-lg">
            <div class="modal-content">
@@ -250,7 +250,7 @@
                        </div>
                        <div class="col-md-6">
                            <div class="form">
-                               <select name="position" class="selectpicker form-control is-valid border rounded" data-width="100%" placeholder="Pozycja">
+                               <select name="position" class="select2 form-control is-valid border rounded" data-width="100%" placeholder="Pozycja">
                                    <option value="Napastnik" {{ $player->position == 'Napastnik' ? 'selected' : '' }}>
                                        Napastnik
                                    </option>
@@ -268,7 +268,7 @@
                        </div>
                        <div class="col-md-6">
                            <div class="form">
-                               <select name="team_id" class="form-control selectpicker border rounded border-1" data-live-search="true" data-width="100%" placeholder="Wybierz Klub" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Wybierz Klub')" required>
+                               <select name="team_id" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" placeholder="Wybierz Klub" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Wybierz Klub')" required>
                                    <option value="{{ $player->team_name }}" selected hidden>{{$player->team_name}}</option>
                                    @foreach($teams as $team)
                                        <option value="{{ $team->name }}" {{ $player->team_name == $team->name ? 'selected' : '' }}>{{ $team->name }}</option>
@@ -277,8 +277,8 @@
                                <div class="invalid-feedback">Klub jest wymagany!</div>
                            </div>
                        </div>
-                       <div class="col-12">
-                           <div class="form-check form-switch" style="padding-top:1rem;">
+                       <div class="col-12" style="padding-top:1rem">
+                           <div class="form-check form-switch">
                                <input class="form-check-input" type="checkbox" value="" id="invalidCheck"
                                    required onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Zatwierdz')"/>
                                <label class="form-check-label" for="invalidCheck">Zatwierdz</label>
@@ -320,13 +320,6 @@
     </script>
 
     <script>
-        $('.selectpicker').selectpicker({
-            style: 'btn-bg: rgba(0,0,0,0)',
-        });
-    </script>
-
-
-    <script>
         // Example starter JavaScript for disabling form submissions if there are invalid fields
         (() => {
             'use strict';
@@ -347,12 +340,24 @@
         })();
     </script>
 
-
     <script>
         $(document).ready(function() {
             $('.select2').select2();
-            $('.select2').select2({
-                dropdownParent: $('#staticBackdrop')
+
+            // Zdarzenie dla modala "editplayer"
+            $('.editplayer').on('shown.bs.modal', function() {
+                var playerId = $(this).data('player-id');
+                $(this).find('.select2').select2({
+                    dropdownParent: $(this)
+                });
+                // Wykonaj inne operacje na podstawie playerId
+            });
+
+            // Zdarzenie dla modala "staticBackdrop"
+            $('#staticBackdrop').on('shown.bs.modal', function() {
+                $(this).find('.select2').select2({
+                    dropdownParent: $(this)
+                });
             });
         });
     </script>

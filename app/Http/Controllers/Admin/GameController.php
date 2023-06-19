@@ -32,6 +32,7 @@ class GameController extends Controller
         $games->team2_id = $request->input('team2_id');
         $games->league_id = $request->input('league_id');
         $games->start_time = $request->input('start_time');
+        $games->round = $request->input('round');
         $games->result1 = $request->input('result1');
         $games->result2 = $request->input('result2');
         $games->save();
@@ -54,17 +55,19 @@ class GameController extends Controller
     public function update(Request $request)
     {
 
-        $games = Game::findOrFail($request->id);
+        $game = Game::findOrFail($request->id);
 
-        $games->team1_id = $request->input('team1_id');
-        $games->team2_id = $request->input('team2_id');
-        $games->start_time = $request->input('start_time');
-        $games->result1 = $request->input('result1');
-        $games->result2 = $request->input('result2');
+        $game->team1_id = $request->input('team1_id_edit');
+        $game->team2_id = $request->input('team2_id_edit');
+        $game->league_id = $request->input('league_id_edit');
+        $game->start_time = $request->input('start_time');
+        $game->round = $request->input('round_edit');
+        $game->result1 = $request->input('result1');
+        $game->result2 = $request->input('result2');
 
-        $games->save();
+        $game->save();
 
-        return redirect()->intended('games')->withUpdate('Rekord został dodany pomyślnie');
+        return redirect()->intended('games')->withUpdate('Rekord został zaktualizowany pomyślnie');
 
     }
 
@@ -92,5 +95,20 @@ class GameController extends Controller
         return response()->json($teamsInLeague);
     }
 
+    public function getTeamsByLeagueEdit(Request $request)
+    {
+        $leagueId = $request->input('league_id_edit');
+        $teamsInLeague = Team::where('league_id', $leagueId)->get();
+
+        return response()->json($teamsInLeague);
+    }
+
+    public function getGameTeams(Request $request)
+    {
+        $gameId = $request->input('game_id');
+        $game = Game::find($gameId, ['team1_id', 'team2_id', 'round']);
+
+        return response()->json($game);
+    }
 
 }

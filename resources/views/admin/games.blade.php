@@ -120,9 +120,9 @@
             <td>{{ $game->result1 }}</td>
             <td>{{ $game->result2 }}</td>
             <td>
-                <a data-bs-toggle="modal" data-bs-target="#edit_game_{{ $game->id }}">
-                    <i class="fa-solid fa-pen-to-square" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
-                </a>
+                <a data-bs-toggle="modal" data-bs-target="#edit_game_{{$game->id}}" data-game-id="{{ $game->id }}"><i
+                        class="fa-solid fa-pen-to-square" style="color:#4f4f4f; padding-right: 0.5rem;"></i></a>
+
                 <a href="#" class="delete" id="{{ $game->id }}">
                     <i class="fa-solid fa-trash" style="color:#4f4f4f;"></i>
                 </a>
@@ -214,7 +214,7 @@
 
 <!-- Modal -->
 @foreach($games as $game)
-    <div class="modal fade" id="edit_game_{{ $game->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal editgame" data-game_id="{{$game->id}}" id="edit_game_{{ $game->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
          aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -229,19 +229,33 @@
                         <input type="hidden" name="id" value="{{ $game->id }}">
                         <div class="col-md-6">
                             <div class="form">
-                                <select name="team1_id" id="team1_id" class="form-control selectpicker border rounded border-1" data-live-search="true" data-width="100%" placeholder="Gospodarze" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Wybierz Klub')" required>
-                                    @foreach($teams as $id => $team)
-                                        <option value="{{ $id }}" {{ (in_array($id, old('team', [])) || isset($game) && $game->team1->id == $id) ? 'selected' : '' }}>{{ $team }}</option>
+                                <select id="league_id_edit_{{ $game->id }}" name="league_id_edit" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%"  data-game-id="{{ $game->id }}" required>
+                                    <option value="" selected>-- Wybierz Ligę --</option>
+                                    @foreach($leagues as $id => $league)
+                                        <option value="{{ $id }}" @if($id == old('league_id_edit', isset($game) ? $game->league_id : '')) selected @endif>{{ $league }}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form">
-                                <select name="team2_id" id="team2_id" class="form-control selectpicker border rounded border-1" data-live-search="true" data-width="100%" placeholder="Goście" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Wybierz Klub')" required>
-                                    @foreach($teams as $id => $team)
-                                        <option value="{{ $id }}" {{ (in_array($id, old('team', [])) || isset($game) && $game->team2->id == $id) ? 'selected' : '' }}>{{ $team }}</option>
-                                    @endforeach
+                                <select id="round_edit_{{ $game->id }}" name="round_edit" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" required>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form">
+                                <select name="team1_id_edit" id="team1_id_edit_{{ $game->id }}" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" placeholder="Gospodarze" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Wybierz Klub')" required>
+                                    <!-- Puste opcje - zostaną uzupełnione dynamicznie -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form">
+                                <select name="team2_id_edit" id="team2_id_edit_{{ $game->id }}" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" placeholder="Goście" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Wybierz Klub')" required>
+                                    <!-- Puste opcje - zostaną uzupełnione dynamicznie -->
                                 </select>
                             </div>
                         </div>
@@ -252,8 +266,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-outline">
-                                <input type="text" class="form-control" name="result1"
-                                       value="{{ old('result1', $game->result1) }}" id="result1"/>
+                                <input type="text" class="form-control" name="result1" value="{{ old('result1', $game->result1) }}" id="result1"/>
                                 <label for="result1" class="form-label">Wynik Gospodarzy</label>
                             </div>
                         </div>
@@ -304,7 +317,33 @@
 {{--</script>--}}
 
 <script>
+    $(document).ready(function() {
+        $('.select2').select2();
+
+        // Zdarzenie dla modala "editgame"
+        $('.editgame').on('shown.bs.modal', function() {
+            console.log("kurwo");
+            var gameId = $(this).data('game_id');
+            console.log(gameId);
+            $(this).find('.select2').select2({
+                dropdownParent: $(this)
+            });
+            handleLeagueEditChange(gameId,true);
+        });
+
+        // Zdarzenie dla modala "staticBackdrop"
+        $('#staticBackdrop').on('shown.bs.modal', function() {
+            $(this).find('.select2').select2({
+                dropdownParent: $(this)
+            });
+        });
+    });
+
+</script>
+
+<script>
     function handleLeagueChange(selectElement) {
+
         var leagueId = selectElement.value;
         var roundSelectElement = document.getElementById('round');
 
@@ -318,29 +357,34 @@
                 type: 'GET',
                 data: { league_id: leagueId },
                 dataType: 'json',
-                success: function(response) {
-                    if (response && response.length) {
-                        var teamsInLeague = response;
-                        var numberOfTeams = teamsInLeague.length;
+                    success: function(response) {
+                        if (response && response.length) {
+                            var teamsInLeague = response;
+                            var numberOfTeams = teamsInLeague.length;
 
-                        // Oblicz liczbę kolejek
-                        var numberOfRounds = (numberOfTeams - 1) * 2;
+                            // Oblicz liczbę kolejek
+                            var numberOfRounds = (numberOfTeams - 1) * 2;
 
-                        // Dodaj opcje kolejek do selecta
-                        for (var i = 1; i <= numberOfRounds; i++) {
-                            var option = document.createElement('option');
-                            option.value = i;
-                            option.textContent = i + '. kolejka';
-                            roundSelectElement.appendChild(option);
+                            // Pobierz nazwę ligi
+                            var selectedLeagueName = selectElement.options[selectElement.selectedIndex].text;
+
+                            // Dodaj opcje kolejek do selecta
+                            for (var i = 1; i <= numberOfRounds; i++) {
+                                var option = document.createElement('option');
+                                option.value = i + '. kolejka - ' + selectedLeagueName;
+                                option.textContent = i + '. kolejka - ' + selectedLeagueName;
+                                roundSelectElement.appendChild(option);
+                            }
+
+                            console.log(numberOfRounds);
                         }
 
-                        console.log(numberOfRounds);
-                    }
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
                 }
             });
+
         }
 
         // Twój kod obsługujący wybieranie drużyn
@@ -353,6 +397,7 @@
             team2Select.empty().append('<option value="" selected>-- Wybierz Klub --</option>');
             return;
         }
+
 
         $.ajax({
             url: '/get-teams-by-league',
@@ -407,6 +452,190 @@
             });
         });
     });
+
+
+</script>
+
+<script>
+
+    function handleLeagueEditChange(gameId,replace) {
+
+
+            var leagueId = $('#league_id_edit_' + gameId).val();
+            var team1Select = $('#team1_id_edit_' + gameId);
+            var team2Select = $('#team2_id_edit_' + gameId);
+            var roundSelectElement = $('#round_edit_' + gameId);
+
+
+            console.log(gameId);
+            console.log(leagueId);
+            console.log(roundSelectElement);
+
+            if (leagueId === '') {
+                return;
+            }
+
+            // Pobierz drużyny dla wybranej ligi za pomocą AJAX
+            $.ajax({
+                url: '/get-teams-by-league-edit',
+                type: 'GET',
+                data: {league_id_edit: leagueId},
+                dataType: 'json',
+                success: function (response) {
+                    team1Select.empty().append('<option value="" selected>-- Wybierz Klub --</option>');
+                    team2Select.empty().append('<option value="" selected>-- Wybierz Klub --</option>');
+
+                    response.forEach(function (team) {
+                        var option1 = new Option(team.name, team.id);
+                        var option2 = new Option(team.name, team.id);
+
+                        team1Select.append(option1);
+                        team2Select.append(option2);
+                    });
+
+                    // Zaznacz domyślną drużynę na podstawie danych z tabeli games
+                    var selectedTeam1Id = "{{ $game->team1_id }}";
+                    var selectedTeam2Id = "{{ $game->team2_id }}";
+
+                    if (gameId && gameId !== '') {
+                        // Pobierz dane meczu za pomocą AJAX
+                        $.ajax({
+                            url: '/get-game-teams',
+                            type: 'GET',
+                            data: {game_id: gameId},
+                            dataType: 'json',
+                            success: function (response) {
+                                if (response && response.team1_id && response.team2_id) {
+                                    selectedTeam1Id = response.team1_id;
+                                    selectedTeam2Id = response.team2_id;
+                                }
+
+                                team1Select.val(selectedTeam1Id).trigger('change');
+                                team2Select.val(selectedTeam2Id).trigger('change');
+                            },
+                            error: function (xhr, status, error) {
+                                console.error(error);
+                            }
+                        });
+                    } else {
+                        team1Select.val(selectedTeam1Id).trigger('change');
+                        team2Select.val(selectedTeam2Id).trigger('change');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+
+        if (leagueId > 0) {
+            // Pobierz drużyny dla wybranej ligi za pomocą AJAX
+            $.ajax({
+                url: '/get-teams-by-league-edit',
+                type: 'GET',
+                data: {league_id_edit: leagueId},
+                dataType: 'json',
+                success: function (response) {
+                    if (response && response.length) {
+                        var teamsInLeague = response;
+                        var numberOfTeams = teamsInLeague.length;
+
+                        // Oblicz liczbę kolejek
+                        var numberOfRounds = (numberOfTeams - 1) * 2;
+
+                        // Pobierz nazwę ligi
+                        var selectedLeagueName = $('#league_id_edit_' + gameId + ' option:selected').text();
+
+                        // Pobierz wartość z kolumny 'round' dla edytowanego meczu
+                        var roundValue = ""; // Zmienna, do której zostanie przypisana wartość z kolumny 'round'
+
+                        if (gameId && gameId !== '') {
+                            // Pobierz dane meczu za pomocą AJAX
+                            $.ajax({
+                                url: '/get-game-teams',
+                                type: 'GET',
+                                data: {game_id: gameId},
+                                dataType: 'json',
+                                success: function (response) {
+                                    if (response && response.round) {
+                                        roundValue = response.round;
+                                    }
+
+                                    populateRoundSelect(roundValue);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error(error);
+                                }
+                            });
+                        } else {
+                            populateRoundSelect(roundValue);
+                        }
+
+                        function populateRoundSelect(roundValue) {
+                            // Pobierz select dla odpowiedniego gameId
+                            var roundSelectElement = $('#round_edit_' + gameId);
+
+                            // Usuń wszystkie opcje z selecta
+                            roundSelectElement.empty();
+
+                            // Dodaj placeholder "Wybierz kolejkę"
+                            roundSelectElement.append($('<option></option>').text('-- Wybierz kolejkę --'));
+
+                            for (var i = 1; i <= numberOfRounds; i++) {
+                                var roundOption = i + '. kolejka - ' + selectedLeagueName;
+                                var option = $('<option></option>').val(roundOption).text(roundOption);
+
+                                // Jeśli wartość opcji jest równa wartości z kolumny 'round' dla edytowanego meczu, ustaw ją jako wybraną
+                                if (roundOption === roundValue) {
+                                    option.attr('selected', 'selected');
+                                }
+
+                                roundSelectElement.append(option);
+                                console.log(roundValue);
+                            }
+                        }
+                    }
+                },
+
+            });
+        }
+
+
+            function disableSelectedTeams() {
+                var team1SelectedValue = $('#team1_id_edit_' + gameId).val();
+                var team2SelectedValue = $('#team2_id_edit_' + gameId).val();
+
+                // Włącz wszystkie opcje w obu selectach
+                $('#team1_id_edit_' + gameId + ' option, #team2_id_edit_' + gameId + ' option').prop('disabled', false);
+
+                // Wyłącz opcje w drugim selectcie, które są już wybrane w pierwszym selectcie
+                if (team1SelectedValue) {
+                    $('#team2_id_edit_' + gameId + ' option[value="' + team1SelectedValue + '"]').prop('disabled', true);
+                }
+
+                // Wyłącz opcje w pierwszym selectcie, które są już wybrane w drugim selectcie
+                if (team2SelectedValue) {
+                    $('#team1_id_edit_' + gameId + ' option[value="' + team2SelectedValue + '"]').prop('disabled', true);
+                }
+            }
+
+
+            // Wywołaj funkcję disableSelectedTeams przy wyborze wartości w selectach team1_id_edit i team2_id_edit
+            $('#team1_id_edit_' + gameId + ', #team2_id_edit_' + gameId).on('change', function() {
+                disableSelectedTeams();
+            });
+
+
+    }
+
+    $(document).ready(function() {
+        @foreach($games as $game)
+
+        // Wywołaj funkcję handleLeagueEditChange przy zmianie ligi
+        $('#league_id_edit_' + {{$game->id}} ).on('change', function() {
+            handleLeagueEditChange({{$game->id}},false);
+        });
+        @endforeach
+    });
 </script>
 
 <script>
@@ -447,14 +676,6 @@
     });
 </script>
 
-<script>
-    $(document).ready(function() {
-        $('.select2').select2();
-        $('.select2').select2({
-            dropdownParent: $('#staticBackdrop')
-        });
-    });
-</script>
 
 <script src="js/admin.js"></script>
 

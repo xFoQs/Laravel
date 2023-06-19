@@ -51,8 +51,8 @@ Route::get('/update', [PlayerController::class, 'edit'])->name('player.update');
     Route::resource('games', \App\Http\Controllers\Admin\GameController::class);
 
     Route::get('/get-teams-by-league', [GameController::class, 'getTeamsByLeague'])->name('getTeamsByLeague');
-
-
+    Route::get('/get-teams-by-league-edit', [GameController::class, 'getTeamsByLeagueEdit'])->name('get.teams.by.league.edit');
+    Route::get('/get-game-teams', [GameController::class, 'getGameTeams']);
 
 });
 
