@@ -13,4 +13,6 @@ class StandingController extends Controller
 
         return view('test2', compact('teams'));
     }
+
+
 }

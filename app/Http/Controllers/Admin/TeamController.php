@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Game;
+use App\Models\League;
 use App\Models\Team;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\Admin\TeamRequest;
+use Illuminate\Http\Request;
 
 class TeamController extends Controller
 {
@@ -15,8 +17,9 @@ class TeamController extends Controller
     public function index(): View
     {
         $teams = Team::all();
+        $leagues = League::all();
 
-        return view('admin.teams.index', compact('teams'));
+        return view('admin.teams', compact('teams','leagues'));
     }
 
     public function create(): View
@@ -26,12 +29,21 @@ class TeamController extends Controller
 
     public function store(TeamRequest $request): RedirectResponse
     {
-        Team::create($request->validated());
+        $team = new Team();
+        $team->name = $request->input('name');
+        $team->league_id = $request->input('league_id');
 
-        return redirect()->route('admin.teams.index')->with([
-            'message' => 'successfully created !',
-            'alert-type' => 'success'
-        ]);
+        if ($request->hasFile('customFile')) {
+            $file = $request->file('customFile');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = uniqid() . '.' . $extension;
+            $file->move(public_path('img'), $fileName);
+            $team->photo = $fileName;
+        }
+
+        $team->save();
+
+        return redirect()->intended('teams')->withSuccess('Rekord został dodany pomyślnie');
     }
 
     public function show(Team $team): View
@@ -46,24 +58,51 @@ class TeamController extends Controller
         return view('admin.teams.edit', compact('team'));
     }
 
-    public function update(TeamRequest $request, Team $team): RedirectResponse
+    public function update(Request $request)
     {
-        $team->update($request->validated());
+        $team = Team::findOrFail($request->id);
 
-        return redirect()->route('admin.teams.index')->with([
-            'message' => 'successfully updated !',
-            'alert-type' => 'info'
-        ]);
+        $team->name = $request->input('name');
+        $team->league_id = $request->input('league_id');
+
+        if ($request->hasFile('customFile')) {
+            // Usuń poprzednie zdjęcie, jeśli istnieje
+            $existingImage = $team->photo;
+            if ($existingImage) {
+                $imagePath = public_path('img') . '/' . $existingImage;
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+
+            // Zapisz nowe zdjęcie
+            $image = $request->file('customFile');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('img'), $imageName);
+            $team->photo = $imageName;
+        } elseif ($request->has('deletePhoto')) {
+            // Usuń zdjęcie, jeśli użytkownik zaznaczył opcję "Usuń zdjęcie"
+            $existingImage = $team->photo;
+            if ($existingImage) {
+                $imagePath = public_path('img') . '/' . $existingImage;
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+                $team->photo = null;
+            }
+        }
+
+        $team->save();
+
+        return redirect()->intended('teams')->withUpdate('Rekord został zaktualizowany pomyślnie');
     }
 
-    public function destroy(Team $team): RedirectResponse
+    public function destroy(Request $id)
     {
-        $team->delete();
+        $teams = Team::find($id->event_id);
+        $teams->delete();
 
-        return back()->with([
-            'message' => 'successfully deleted !',
-            'alert-type' => 'danger'
-        ]);
+        return $teams;
     }
 
     public function massDestroy()

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Game;
 use App\Models\Player;
+use Illuminate\Http\Request;
 
 class PlayerController extends Controller
 {
@@ -11,4 +13,6 @@ class PlayerController extends Controller
 
         return view('test3', compact('players'));
     }
+
+
 }

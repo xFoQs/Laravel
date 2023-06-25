@@ -13,15 +13,19 @@
                             <thead class="table-success">
                             <tr>
                                 <th scope="col">No</th>
-                                <th scope="col">Team</th>
-                                <th scope="col">Won</th>
-                                <th scope="col">Tied</th>
-                                <th scope="col">Lost</th>
-                                <th scope="col">Points</th>
+                                <th scope="col">Drużyna</th>
+                                <th scope="col">Wygrane</th>
+                                <th scope="col">Remisy</th>
+                                <th scope="col">Przegrane</th>
+                                <th scope="col">Punkty</th>
+                                <th scope="col">Bilans</th>
                             </tr>
                             </thead>
                             <tbody>
                             @foreach($teams as $team)
+                                @php
+                                    $goalStats = $team->getGoalStats();
+                                @endphp
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ $team->name }}</td>
@@ -29,6 +33,7 @@
                                     <td>{{ $team->tied }}</td>
                                     <td>{{ $team->lost }}</td>
                                     <td>{{ $team->points }}</td>
+                                    <td>{{ $goalStats['scored'] }}:{{ $goalStats['conceded'] }}</td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -37,6 +42,5 @@
                 </div>
             </div>
         </div>
-
     </div>
 @endsection

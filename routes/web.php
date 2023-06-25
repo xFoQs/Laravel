@@ -23,6 +23,7 @@ Route::get('/', function () {
 
 Route::get('test', [\App\Http\Controllers\GameController::class, 'index'])->name('test');
 Route::get('test2', [\App\Http\Controllers\StandingController::class, 'index'])->name('test2');
+Route::get('score', [\App\Http\Controllers\StandingController::class, 'getBalance'])->name('score');
 Route::get('test3', [\App\Http\Controllers\PlayerController::class, 'index'])->name('test3');
 
 Route::get('login', [AuthController::class, 'index'])->name('login');
@@ -40,7 +41,10 @@ Route::get('teams', [TeamController::class, 'index']);
 Route::get('games', [GameController::class, 'index']);
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/players',[PlayerController::class, 'store'])->name('player.store');
+Route::post('/teams',[TeamController::class, 'store'])->name('team.store');
 Route::get('deleted',[PlayerController::class, 'destroy'])->name('player.delete');
+Route::get('teamsdeleted',[TeamController::class, 'destroy'])->name('team.delete');
+Route::post('/teamsupdated', [TeamController::class, 'update'])->name('team.update');
 
 Route::get('/update', [PlayerController::class, 'edit'])->name('player.update');
     Route::post('/update', [PlayerController::class, 'update'])->name('update');

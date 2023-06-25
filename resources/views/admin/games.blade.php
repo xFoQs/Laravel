@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/searchpanes/2.1.2/css/searchPanes.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.6.2/css/select.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
+
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <!-- Google Fonts -->
@@ -22,6 +28,8 @@
 
     <!-- Sweetalert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
 
 
 </head>
@@ -42,8 +50,8 @@
             <div class="nav_list"> <a href="/dashboard" class="nav_link"> <i class='bx bx-grid-alt nav_icon'></i>
                     <span class="nav_name">Dashboard</span> </a> <a href="/players" class="nav_link"> <i
                         class='bx bx-user nav_icon'></i> <span class="nav_name">Zawodnicy</span> </a> <a href="" class="nav_link active"> <i class='bx bxs-grid nav_icon'></i> <span
-                        class="nav_name">Drużyny</span> </a> <a href="" class="nav_link"> <i
-                        class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Bookmark</span> </a> <a
+                        class="nav_name">Mecze</span> </a> <a href="/teams" class="nav_link"> <i
+                        class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Drużyny</span> </a> <a
                     href="#" class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span
                         class="nav_name">Files</span> </a>
                 <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span
@@ -56,8 +64,8 @@
 
 <div id="content" style="padding-top:5rem; height:100%;">
 
-    <div class="contenthead" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
-        <h3 style="padding-right:2rem;">Mecze</h3>
+    <div class="contenthead" style="display:flex; justify-content:space-between; margin-bottom:1rem; margin-top: 2rem">
+        <h2 style="padding-right:2rem;">Zarządzaj meczami</h2>
 
         <!-- Button trigger modal -->
 
@@ -92,15 +100,15 @@
 </div>
 
 <br>
-
-<table id="example" class="table table-striped" style="width:100%">
+<div style="width: 100%; margin: 0 auto;">
+<table id="example" class="table table-bordered display" style="width:100%">
     <thead>
     <tr>
         <th>No</th>
-        <th>Klub</th>
-        <th>Klub</th>
+        <th>Nazwa</th>
         <th>Liga</th>
-        <th>Termin</th>
+        <th>Kolejka</th>
+        <th>Data</th>
         <th>Wynik Gospodarzy</th>
         <th>Wynik Gościi</th>
         <th>Action</th>
@@ -111,11 +119,11 @@
         @php
             $localizedDate = \Carbon\Carbon::parse($game->start_time)->locale('pl_PL');
         @endphp
-        <tr data-entry-id="{{ $game->id }}">
+        <tr class="searchPanes-value" data-entry-id="{{ $game->id }}">
             <td>{{ $loop->iteration }}</td>
-            <td>{{ $game->team1->name }}</td>
-            <td>{{ $game->team2->name }}</td>
+            <td>{{ $game->team1->name }} - {{ $game->team2->name }}</td>
             <td>{{ $game->league->name }}</td>
+            <td>{{ $game->round }}</td>
             <td>{{ $localizedDate->isoFormat('D MMMM YYYY') }}</td>
             <td>{{ $game->result1 }}</td>
             <td>{{ $game->result2 }}</td>
@@ -131,6 +139,8 @@
     @endforeach
     </tbody>
 </table>
+
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -310,6 +320,18 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+<script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
+<script src="https://cdn.datatables.net/searchpanes/2.1.2/js/searchPanes.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+
+
 {{--<script>--}}
 {{--    $('.selectpicker').selectpicker({--}}
 {{--        style: 'btn-bg: rgba(0,0,0,0)',--}}
@@ -457,75 +479,160 @@
 </script>
 
 <script>
-
-    function handleLeagueEditChange(gameId,replace) {
-
-
-            var leagueId = $('#league_id_edit_' + gameId).val();
-            var team1Select = $('#team1_id_edit_' + gameId);
-            var team2Select = $('#team2_id_edit_' + gameId);
-            var roundSelectElement = $('#round_edit_' + gameId);
-
-
-            console.log(gameId);
-            console.log(leagueId);
-            console.log(roundSelectElement);
-
-            if (leagueId === '') {
-                return;
-            }
-
-            // Pobierz drużyny dla wybranej ligi za pomocą AJAX
-            $.ajax({
-                url: '/get-teams-by-league-edit',
-                type: 'GET',
-                data: {league_id_edit: leagueId},
-                dataType: 'json',
-                success: function (response) {
-                    team1Select.empty().append('<option value="" selected>-- Wybierz Klub --</option>');
-                    team2Select.empty().append('<option value="" selected>-- Wybierz Klub --</option>');
-
-                    response.forEach(function (team) {
-                        var option1 = new Option(team.name, team.id);
-                        var option2 = new Option(team.name, team.id);
-
-                        team1Select.append(option1);
-                        team2Select.append(option2);
-                    });
-
-                    // Zaznacz domyślną drużynę na podstawie danych z tabeli games
-                    var selectedTeam1Id = "{{ $game->team1_id }}";
-                    var selectedTeam2Id = "{{ $game->team2_id }}";
-
-                    if (gameId && gameId !== '') {
-                        // Pobierz dane meczu za pomocą AJAX
-                        $.ajax({
-                            url: '/get-game-teams',
-                            type: 'GET',
-                            data: {game_id: gameId},
-                            dataType: 'json',
-                            success: function (response) {
-                                if (response && response.team1_id && response.team2_id) {
-                                    selectedTeam1Id = response.team1_id;
-                                    selectedTeam2Id = response.team2_id;
-                                }
-
-                                team1Select.val(selectedTeam1Id).trigger('change');
-                                team2Select.val(selectedTeam2Id).trigger('change');
-                            },
-                            error: function (xhr, status, error) {
-                                console.error(error);
-                            }
-                        });
-                    } else {
-                        team1Select.val(selectedTeam1Id).trigger('change');
-                        team2Select.val(selectedTeam2Id).trigger('change');
+    $(document).ready(function() {
+        var table = $('#example').DataTable({
+            paging: false,
+            searchPanes: true,
+            dom: 'PBfrtip',
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6]
                     }
                 },
-                error: function (xhr, status, error) {
-                    console.error(error);
+                {
+                    extend: 'csvHtml5',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6]
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6]
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6]
+                    }
+                },
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5, 6]
+                    }
                 }
-            });
+            ],
+            language: {
+                searchPanes: {
+                    clearMessage: 'Wyczyść',
+                    collapse: {
+                        0: 'Pokaż',
+                        _: 'Pokaż wszystko (%d)'
+                    },
+                    count: '{total}',
+                    countFiltered: '{shown} ({total})',
+                    emptyPanes: 'Brak danych do wyświetlenia',
+                    loadMessage: 'Ładowanie filtrów...',
+                    title: 'Filtry aktywne - %d'
+                },
+            },
+
+            columnDefs: [
+                {
+                    searchPanes: {
+                        show: true
+                    },
+                    targets: [2, 3, 4]
+                },
+                {
+                    searchPanes: {
+                        show: false
+                    },
+                    targets: [5, 6]
+                }
+            ],
+        });
+
+        table.searchPanes.container().prependTo('#searchPanesContainer');
+        table.searchPanes.resizePanes();
+
+        // Funkcja do odświeżania tabeli
+        function refreshTable() {
+            table.draw();
+        }
+
+        refreshTable();
+    });
+
+</script>
+
+
+<script>
+    function handleLeagueEditChange(gameId, replace) {
+        var leagueId = $('#league_id_edit_' + gameId).val();
+
+        if (!leagueId) {
+            return;
+        }
+
+        var team1Select = $('#team1_id_edit_' + gameId);
+        var team2Select = $('#team2_id_edit_' + gameId);
+        var roundSelectElement = $('#round_edit_' + gameId);
+
+        console.log(gameId);
+        console.log(leagueId);
+        console.log(roundSelectElement);
+
+        // Pobierz drużyny dla wybranej ligi za pomocą AJAX
+        $.ajax({
+            url: '/get-teams-by-league-edit',
+            type: 'GET',
+            data: {league_id_edit: leagueId},
+            dataType: 'json',
+            success: function (response) {
+                team1Select.empty().append('<option value="" selected>-- Wybierz Klub --</option>');
+                team2Select.empty().append('<option value="" selected>-- Wybierz Klub --</option>');
+
+                response.forEach(function (team) {
+                    var option1 = new Option(team.name, team.id);
+                    var option2 = new Option(team.name, team.id);
+
+                    team1Select.append(option1);
+                    team2Select.append(option2);
+                });
+
+                // Zaznacz domyślną drużynę na podstawie danych z tabeli games
+                var selectedTeam1Id = "";
+                var selectedTeam2Id = "";
+
+                @if(isset($game))
+                    selectedTeam1Id = "{{ $game->team1_id }}";
+                selectedTeam2Id = "{{ $game->team2_id }}";
+                @endif
+
+                if (gameId && gameId !== '') {
+                    // Pobierz dane meczu za pomocą AJAX
+                    $.ajax({
+                        url: '/get-game-teams',
+                        type: 'GET',
+                        data: {game_id: gameId},
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response && response.team1_id && response.team2_id) {
+                                selectedTeam1Id = response.team1_id;
+                                selectedTeam2Id = response.team2_id;
+                            }
+
+                            team1Select.val(selectedTeam1Id).trigger('change');
+                            team2Select.val(selectedTeam2Id).trigger('change');
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(error);
+                        }
+                    });
+                } else {
+                    team1Select.val(selectedTeam1Id).trigger('change');
+                    team2Select.val(selectedTeam2Id).trigger('change');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        });
 
         if (leagueId > 0) {
             // Pobierz drużyny dla wybranej ligi za pomocą AJAX
@@ -595,45 +702,42 @@
                         }
                     }
                 },
-
             });
         }
 
+        function disableSelectedTeams() {
+            var team1SelectedValue = $('#team1_id_edit_' + gameId).val();
+            var team2SelectedValue = $('#team2_id_edit_' + gameId).val();
 
-            function disableSelectedTeams() {
-                var team1SelectedValue = $('#team1_id_edit_' + gameId).val();
-                var team2SelectedValue = $('#team2_id_edit_' + gameId).val();
+            // Włącz wszystkie opcje w obu selectach
+            $('#team1_id_edit_' + gameId + ' option, #team2_id_edit_' + gameId + ' option').prop('disabled', false);
 
-                // Włącz wszystkie opcje w obu selectach
-                $('#team1_id_edit_' + gameId + ' option, #team2_id_edit_' + gameId + ' option').prop('disabled', false);
-
-                // Wyłącz opcje w drugim selectcie, które są już wybrane w pierwszym selectcie
-                if (team1SelectedValue) {
-                    $('#team2_id_edit_' + gameId + ' option[value="' + team1SelectedValue + '"]').prop('disabled', true);
-                }
-
-                // Wyłącz opcje w pierwszym selectcie, które są już wybrane w drugim selectcie
-                if (team2SelectedValue) {
-                    $('#team1_id_edit_' + gameId + ' option[value="' + team2SelectedValue + '"]').prop('disabled', true);
-                }
+            // Wyłącz opcje w drugim selectcie, które są już wybrane w pierwszym selectcie
+            if (team1SelectedValue) {
+                $('#team2_id_edit_' + gameId + ' option[value="' + team1SelectedValue + '"]').prop('disabled', true);
             }
 
+            // Wyłącz opcje w pierwszym selectcie, które są już wybrane w drugim selectcie
+            if (team2SelectedValue) {
+                $('#team1_id_edit_' + gameId + ' option[value="' + team2SelectedValue + '"]').prop('disabled', true);
+            }
+        }
 
-            // Wywołaj funkcję disableSelectedTeams przy wyborze wartości w selectach team1_id_edit i team2_id_edit
-            $('#team1_id_edit_' + gameId + ', #team2_id_edit_' + gameId).on('change', function() {
-                disableSelectedTeams();
-            });
-
-
+        // Wywołaj funkcję disableSelectedTeams przy wyborze wartości w selectach team1_id_edit i team2_id_edit
+        $('#team1_id_edit_' + gameId + ', #team2_id_edit_' + gameId).on('change', function() {
+            disableSelectedTeams();
+        });
     }
 
     $(document).ready(function() {
         @foreach($games as $game)
+        var leagueEditElement = $('#league_id_edit_' + {{$game->id}});
 
-        // Wywołaj funkcję handleLeagueEditChange przy zmianie ligi
-        $('#league_id_edit_' + {{$game->id}} ).on('change', function() {
-            handleLeagueEditChange({{$game->id}},false);
-        });
+        if (leagueEditElement.length) {
+            leagueEditElement.on('change', function() {
+                handleLeagueEditChange({{$game->id}}, false);
+            });
+        }
         @endforeach
     });
 </script>

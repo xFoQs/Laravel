@@ -13,6 +13,12 @@
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/searchpanes/2.1.2/css/searchPanes.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.6.2/css/select.bootstrap4.min.css">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <!-- Google Fonts -->
@@ -43,8 +49,8 @@
                         <span class="nav_name">Dashboard</span> </a> <a href="" class="nav_link active"> <i
                             class='bx bx-user nav_icon'></i> <span class="nav_name">Zawodnicy</span> </a> <a href="/games"
                         class="nav_link"> <i class='bx bxs-grid nav_icon'></i> <span
-                            class="nav_name">Drużyny</span> </a> <a href="" class="nav_link"> <i
-                            class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Bookmark</span> </a> <a
+                            class="nav_name">Mecze</span> </a> <a href="/teams" class="nav_link"> <i
+                            class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Drużyny</span> </a> <a
                         href="#" class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span
                             class="nav_name">Files</span> </a>
                     <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span
@@ -57,8 +63,8 @@
 
     <div id="content" style="padding-top:5rem; height:100%;">
 
-        <div class="contenthead" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
-            <h3 style="padding-right:2rem;">Zawodnicy</h3>
+        <div class="contenthead" style="display:flex; justify-content:space-between; margin-bottom:1rem;margin-top: 2rem;">
+            <h2 style="padding-right:2rem;">Zawodnicy</h2>
 
             <!-- Button trigger modal -->
 
@@ -94,25 +100,26 @@
 
     <br>
 
-    <table id="example" class="table table-striped" style="width:100%">
+    <table id="example" class="table table-bordered" style="width:100%">
         <thead>
             <tr>
-                <th>No</th>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>Birthday</th>
-                <th>Position</th>
-                <th>Club</th>
-                <th>Action</th>
+                <th>#</th>
+                <th>Zawodnik</th>
+                <th>Data urodzenia</th>
+                <th>Pozycja</th>
+                <th>Klub</th>
+                <th>Akcje</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($players as $player)
+                @php
+                    $localizedDate = \Carbon\Carbon::parse($player->birth_date)->locale('pl_PL');
+                @endphp
                 <tr data-entry-id="{{ $player->id }}">
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $player->name }}</td>
-                    <td>{{ $player->surname }}</td>
-                    <td>{{ $player->birth_date }}</td>
+                    <td>{{ $player->name }} {{ $player->surname }}</td>
+                    <td>{{ date('d.m.Y', strtotime($player->birth_date)) }}</td>
                     <td>{{ $player->position }}</td>
                     <td>{{ $player->team_name }}</td>
                     <td>
@@ -188,7 +195,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-12" style="padding-top:1rem">
+                        <div class="col-12" style="padding-top:1rem;">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" value="" id="invalidCheck"
                                     required onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Zatwierdz')"/>
@@ -224,7 +231,7 @@
                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body">
-                   <form class="row gx-3 gy-0" method="POST" action="{{route('player.update')}}">
+                   <form class="row gx-3" method="POST" action="{{route('player.update')}}">
                        @csrf
                        <input type="hidden" name="id" value="{{ $player->id }}">
                        <div class="col-md-4">
@@ -313,11 +320,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            $('#example').DataTable();
-        });
-    </script>
+    <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
+    <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/searchPanes.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
 
     <script>
         // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -398,6 +411,87 @@
                 }
             })
         });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#example').DataTable({
+                paging: false,
+                searchPanes: true,
+                dom: 'PBfrtip',
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    }
+                ],
+                language: {
+                    searchPanes: {
+                        clearMessage: 'Wyczyść',
+                        collapse: {
+                            0: 'Pokaż',
+                            _: 'Pokaż wszystko (%d)'
+                        },
+                        count: '{total}',
+                        countFiltered: '{shown} ({total})',
+                        emptyPanes: 'Brak danych do wyświetlenia',
+                        loadMessage: 'Ładowanie filtrów...',
+                        title: 'Filtry aktywne - %d'
+                    },
+                },
+                columnDefs: [
+                    {
+                        searchPanes: {
+                            show: true
+                        },
+                        targets: [1, 2, 3, 4]
+                    },
+                    {
+                        searchPanes: {
+                            show: false
+                        },
+                        targets: [5]
+                    }
+                ]
+            });
+
+            table.searchPanes.container().prependTo('#searchPanesContainer');
+            table.searchPanes.resizePanes();
+
+            // Funkcja do odświeżania tabeli
+            function refreshTable() {
+                table.draw();
+            }
+
+            refreshTable();
+        });
+
     </script>
 
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Team extends Model
 {
@@ -24,6 +25,7 @@ class Team extends Model
     {
         return $this->belongsTo(League::class, 'league_id');
     }
+
 
     public function getGamesAttribute()
     {
@@ -73,5 +75,31 @@ class Team extends Model
 
     public function getPointsAttribute(){
         return $this->getWonAttribute() * 3 + $this->getTiedAttribute() * 1;
+    }
+
+    public function getGoalStats()
+    {
+        $teamId = $this->attributes['id'];
+
+        $scoredGoals = Game::where('team1_id', $teamId)
+            ->whereNotNull('result1')
+            ->sum('result1');
+
+        $concededGoals = Game::where('team1_id', $teamId)
+            ->whereNotNull('result2')
+            ->sum('result2');
+
+        $scoredGoals += Game::where('team2_id', $teamId)
+            ->whereNotNull('result2')
+            ->sum('result2');
+
+        $concededGoals += Game::where('team2_id', $teamId)
+            ->whereNotNull('result1')
+            ->sum('result1');
+
+        return [
+            'scored' => $scoredGoals,
+            'conceded' => $concededGoals,
+        ];
     }
 }
