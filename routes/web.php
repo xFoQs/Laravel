@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\PlayerController;
 use App\Http\Controllers\Admin\TeamController;
 use Illuminate\Support\Facades\Route;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -39,6 +40,8 @@ Route::get('dashboard', [AuthController::class, 'dashboard']);
 Route::get('players', [PlayerController::class, 'index']);
 Route::get('teams', [TeamController::class, 'index']);
 Route::get('games', [GameController::class, 'index']);
+
+
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/players',[PlayerController::class, 'store'])->name('player.store');
 Route::post('/teams',[TeamController::class, 'store'])->name('team.store');
@@ -57,6 +60,16 @@ Route::get('/update', [PlayerController::class, 'edit'])->name('player.update');
     Route::get('/get-teams-by-league', [GameController::class, 'getTeamsByLeague'])->name('getTeamsByLeague');
     Route::get('/get-teams-by-league-edit', [GameController::class, 'getTeamsByLeagueEdit'])->name('get.teams.by.league.edit');
     Route::get('/get-game-teams', [GameController::class, 'getGameTeams']);
+    Route::get('/get-game-live', [GameController::class, 'getGameLive']);
+
+    Route::get('/livegame',[\App\Http\Controllers\Admin\LiveGameController::class, 'index']);
+    Route::post('/select-game', [LiveGameController::class, 'selectGame'])->name('select.game');
+    Route::get('/admin/livegame/{gameId}', [App\Http\Controllers\Admin\LiveGameController::class, 'updateGameData'])->name('admin.livegame.updateGameData');
+
+    Route::get('/players/{teamId}/{seasonId}', [App\Http\Controllers\Admin\LiveGameController::class, 'getPlayersByTeamAndSeason']);
+
+
+
 
 });
 

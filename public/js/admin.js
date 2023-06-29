@@ -38,3 +38,18 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     // Your code to run since DOM is loaded and ready
 });
+
+document.addEventListener("DOMContentLoaded", function(event) {
+    // Pobierz ścieżkę bieżącej strony
+    var path = window.location.pathname;
+
+    // Znajdź odpowiedni link w menu i dodaj mu klasę aktywną
+    var activeLink = document.querySelector(".nav_link[href='" + path + "']");
+    if (activeLink) {
+        activeLink.classList.add("active");
+    }
+});
+
+
+
+

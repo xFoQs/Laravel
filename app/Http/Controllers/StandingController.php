@@ -8,8 +8,13 @@ use App\Http\Controllers\Controller;
 
 class StandingController extends Controller
 {
-    public function index(){
-        $teams = Team::all()->sortByDesc('points');
+    public function index()
+    {
+        $leagueName = "A klasa podkarpacka";
+
+        $teams = Team::whereHas('league', function ($query) use ($leagueName) {
+            $query->where('name', $leagueName);
+        })->with('league')->get()->sortByDesc('points');
 
         return view('test2', compact('teams'));
     }

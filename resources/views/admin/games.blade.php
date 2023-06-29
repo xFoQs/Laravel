@@ -43,38 +43,25 @@
     </div>
 </header>
 
-<div class="l-navbar" id="nav-bar">
-    <nav class="nav">
-        <div> <a href="#" class="nav_logo"> <i class='bx bx-football nav_logo-icon'></i> <span
-                    class="nav_logo-name">MatchMaster</span> </a>
-            <div class="nav_list"> <a href="/dashboard" class="nav_link"> <i class='bx bx-grid-alt nav_icon'></i>
-                    <span class="nav_name">Dashboard</span> </a> <a href="/players" class="nav_link"> <i
-                        class='bx bx-user nav_icon'></i> <span class="nav_name">Zawodnicy</span> </a> <a href="" class="nav_link active"> <i class='bx bxs-grid nav_icon'></i> <span
-                        class="nav_name">Mecze</span> </a> <a href="/teams" class="nav_link"> <i
-                        class='bx bx-bookmark nav_icon'></i> <span class="nav_name">Drużyny</span> </a> <a
-                    href="#" class="nav_link"> <i class='bx bx-folder nav_icon'></i> <span
-                        class="nav_name">Files</span> </a>
-                <a href="#" class="nav_link"> <i class='bx bx-bar-chart-alt-2 nav_icon'></i> <span
-                        class="nav_name">Stats</span> </a>
-            </div>
-        </div> <a href="{{ route('logout') }}" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span
-                class="nav_name">SignOut</span> </a>
-    </nav>
-</div>
+@extends('layouts.sidebar')
 
 <div id="content" style="padding-top:5rem; height:100%;">
 
     <div class="contenthead" style="display:flex; justify-content:space-between; margin-bottom:1rem; margin-top: 2rem">
-        <h2 style="padding-right:2rem;">Zarządzaj meczami</h2>
 
+        <div><h2 style="padding-right:2rem;">Zarządzaj meczami</h2></div>
         <!-- Button trigger modal -->
+        <div>
+            <button type="button" class="btn btn-outline-primary btn-rectangle" data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop">
+                Dodaj Mecz
+            </button>
 
-        <button type="button" class="btn btn-outline-primary btn-rounded" data-bs-toggle="modal"
-                data-bs-target="#staticBackdrop" style="height: 45px;width: 170px;">
-            Dodaj Mecz
-        </button>
+            <a href="/livegame" class="btn btn-outline-primary btn-rectangle">
+                Prowadź relacje <span id="matchCount"></span>
+            </a>
 
-
+        </div>
     </div>
 
     @if (Session::has('success'))
@@ -101,46 +88,63 @@
 
 <br>
 <div style="width: 100%; margin: 0 auto;">
-<table id="example" class="table table-bordered display" style="width:100%">
-    <thead>
-    <tr>
-        <th>No</th>
-        <th>Nazwa</th>
-        <th>Liga</th>
-        <th>Kolejka</th>
-        <th>Data</th>
-        <th>Wynik Gospodarzy</th>
-        <th>Wynik Gościi</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach ($games as $game)
-        @php
-            $localizedDate = \Carbon\Carbon::parse($game->start_time)->locale('pl_PL');
-        @endphp
-        <tr class="searchPanes-value" data-entry-id="{{ $game->id }}">
-            <td>{{ $loop->iteration }}</td>
-            <td>{{ $game->team1->name }} - {{ $game->team2->name }}</td>
-            <td>{{ $game->league->name }}</td>
-            <td>{{ $game->round }}</td>
-            <td>{{ $localizedDate->isoFormat('D MMMM YYYY') }}</td>
-            <td>{{ $game->result1 }}</td>
-            <td>{{ $game->result2 }}</td>
-            <td>
-                <a data-bs-toggle="modal" data-bs-target="#edit_game_{{$game->id}}" data-game-id="{{ $game->id }}"><i
-                        class="fa-solid fa-pen-to-square" style="color:#4f4f4f; padding-right: 0.5rem;"></i></a>
-
-                <a href="#" class="delete" id="{{ $game->id }}">
-                    <i class="fa-solid fa-trash" style="color:#4f4f4f;"></i>
-                </a>
-            </td>
+    <table id="example" class="table table-bordered display" style="width:100%">
+        <thead>
+        <tr>
+            <th>No</th>
+            <th>Nazwa</th>
+            <th>Liga</th>
+            <th>Kolejka</th>
+            <th>Data</th>
+            <th>Godzina</th>
+            <th>Sezon</th>
+            <th>Wynik Meczu</th>
+            <th>Action</th>
         </tr>
-    @endforeach
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        @foreach ($games as $game)
+            @php
+                $localizedDate = \Carbon\Carbon::parse($game->start_time)->locale('pl_PL');
+                $localizedTime = \Carbon\Carbon::parse($game->start_time)->format('H:i');
+            @endphp
+            <tr class="searchPanes-value" data-entry-id="{{ $game->id }}">
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $game->team1->name }} - {{ $game->team2->name }}</td>
+                <td>{{ $game->league->name }}</td>
+                <td>{{ $game->round }}</td>
+                <td>{{ $localizedDate->isoFormat('D MMMM YYYY') }}</td>
+                <td>{{ $localizedTime }}</td>
+                <td>{{ $game->season->name ?? 'Brak sezonu' }}</td>
+                <td>
+                    @if (!empty($game->result1) && !empty($game->result2))
+                        {{ $game->result1 }}:{{ $game->result2 }}
+                    @endif
+                </td>
+                <td>
+                    <a class="toggle-match" data-game-id="{{ $game->id }}">
+                        @if (in_array($game->id, $selectedGames))
+                            <i class="fa-solid fa-minus-circle minus-icon" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
+                            <i class="fa-solid fa-plus-circle plus-icon hidden" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
+                        @else
+                            <i class="fa-solid fa-minus-circle minus-icon hidden" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
+                            <i class="fa-solid fa-plus-circle plus-icon" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
+                        @endif
+                    </a>
+                    <a data-bs-toggle="modal" data-bs-target="#edit_game_{{ $game->id }}" data-game-id="{{ $game->id }}">
+                        <i class="fa-solid fa-pen-to-square" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
+                    </a>
+                    <a href="#" class="delete" id="{{ $game->id }}">
+                        <i class="fa-solid fa-trash" style="color:#4f4f4f;"></i>
+                    </a>
+                </td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
 
 </div>
+
 
 <!-- Modal -->
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -154,7 +158,17 @@
             <div class="modal-body">
                 <form class="row g-3"  method="POST" action="{{ route('games.store') }}">
                     @csrf
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <div class="form">
+                            <select id="season_id" name="season_id" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" required>
+                                <option value="">Wybierz sezon</option>
+                                @foreach ($seasons as $season)
+                                    <option value="{{ $season->id }}">{{ $season->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <div class="form">
                             <select id="league_id" name="league_id" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" onchange="handleLeagueChange(this)" required>
                                 <option value="" selected>-- Wybierz Ligę --</option>
@@ -164,7 +178,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form">
                             <select id="round" name="round" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" required>
                                 <option value="" selected>-- Wybierz Kolejkę --</option>
@@ -237,7 +251,17 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="id" value="{{ $game->id }}">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <div class="form">
+                                <select id="season_id" name="season_id" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" required>
+                                    <option value="">Wybierz sezon</option>
+                                    @foreach ($seasons as $season)
+                                        <option value="{{ $season->id }}" {{ $game->season_id == $season->id ? 'selected' : '' }}>{{ $season->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form">
                                 <select id="league_id_edit_{{ $game->id }}" name="league_id_edit" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%"  data-game-id="{{ $game->id }}" required>
                                     <option value="" selected>-- Wybierz Ligę --</option>
@@ -247,7 +271,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form">
                                 <select id="round_edit_{{ $game->id }}" name="round_edit" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" required>
 
@@ -338,6 +362,81 @@
 {{--    });--}}
 {{--</script>--}}
 
+
+    <script>
+        $(document).ready(function() {
+            $('.toggle-match').on('click', function () {
+                var gameId = $(this).data('game-id');
+                var storedGames = JSON.parse(getCookie('selectedGames')) || [];
+
+                var index = storedGames.indexOf(gameId);
+                if (index === -1) {
+                    // Dodaj do pamięci podręcznej
+                    storedGames.push(gameId);
+                } else {
+                    // Usuń z pamięci podręcznej
+                    storedGames.splice(index, 1);
+                }
+
+                // Zapisz zmiany w pliku cookie
+                setCookie('selectedGames', JSON.stringify(storedGames));
+
+                // Aktualizuj ikony dodawania/usuwania meczu
+                updateMatchIcons();
+
+                // Aktualizuj liczbę meczów w przycisku "Prowadź relacje"
+                updateMatchCount();
+            });
+
+            function updateMatchIcons() {
+                var storedGames = JSON.parse(getCookie('selectedGames')) || [];
+                $('.toggle-match').each(function () {
+                    var gameId = $(this).data('game-id');
+                    var plusIcon = $(this).find('.plus-icon');
+                    var minusIcon = $(this).find('.minus-icon');
+
+                    if (storedGames.indexOf(gameId) === -1) {
+                        plusIcon.removeClass('hidden');
+                        minusIcon.addClass('hidden');
+                    } else {
+                        plusIcon.addClass('hidden');
+                        minusIcon.removeClass('hidden');
+                    }
+                });
+            }
+
+            function updateMatchCount() {
+                var storedGames = JSON.parse(getCookie('selectedGames')) || [];
+                var matchCount = storedGames.length;
+                $('#matchCount').text('(' + matchCount + ')');
+            }
+
+            // Funkcja do pobierania wartości pliku cookie
+            function getCookie(name) {
+                var value = "; " + document.cookie;
+                var parts = value.split("; " + name + "=");
+                if (parts.length === 2) {
+                    return parts.pop().split(";").shift();
+                }
+                return null;
+            }
+
+            // Funkcja do ustawiania pliku cookie
+            function setCookie(name, value) {
+                var date = new Date();
+                date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000)); // Ważność pliku cookie - 1 rok
+                var expires = "expires=" + date.toUTCString();
+                document.cookie = name + "=" + value + "; " + expires + "; path=/";
+            }
+
+            // Wywołaj funkcję updateMatchIcons() przy starcie strony, aby zaktualizować ikony
+            updateMatchIcons();
+            updateMatchCount();
+        });
+</script>
+
+
+
 <script>
     $(document).ready(function() {
         $('.select2').select2();
@@ -360,6 +459,7 @@
             });
         });
     });
+
 
 </script>
 
@@ -536,13 +636,13 @@
                     searchPanes: {
                         show: true
                     },
-                    targets: [2, 3, 4]
+                    targets: [2, 3, 4, 6]
                 },
                 {
                     searchPanes: {
                         show: false
                     },
-                    targets: [5, 6]
+                    targets: [5, 7]
                 }
             ],
         });

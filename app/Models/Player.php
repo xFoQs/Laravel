@@ -14,4 +14,20 @@ class Player extends Model
     public function team(){
         return $this->belongsTo(Team::class);
     }
+
+    public function seasons()
+    {
+        return $this->belongsToMany(Season::class, 'player_seasons')->withPivot('team_id');
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'player_seasons', 'player_id', 'team_id')
+            ->withPivot('season_id');
+    }
+
+    public function playerSeasons()
+    {
+        return $this->hasMany(PlayerSeason::class);
+    }
 }

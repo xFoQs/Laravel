@@ -5,11 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Game;
 use App\Models\Team;
 use App\Models\League;
+use App\Models\Season;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\Admin\GameRequest;
-use DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 
 class GameController extends Controller
@@ -18,11 +17,18 @@ class GameController extends Controller
     public function index(): View
     {
         $games = Game::all();
-        $leagues = League::pluck('name','id');
+        $leagues = League::pluck('name', 'id');
         $teams = Team::pluck('name', 'id');
+        $seasons = Season::all();
 
+        $selectedGames = [];
 
-        return view('admin.games', compact('games', 'teams', 'leagues'));
+        // Sprawdź, czy istnieją zapisane gry w pamięci podręcznej
+        if (isset($_COOKIE['selectedGames'])) {
+            $selectedGames = json_decode($_COOKIE['selectedGames'], true);
+        }
+
+        return view('admin.games', compact('games', 'teams', 'leagues', 'seasons', 'selectedGames'));
     }
 
     public function store(Request $request)
@@ -110,5 +116,18 @@ class GameController extends Controller
 
         return response()->json($game);
     }
+
+    public function showSelectedGames()
+    {
+        $storedGames = json_decode(request()->session()->get('selectedGames'), true);
+
+        // Pobierz wszystkie dane dla tabeli games dla przechowywanych identyfikatorów
+        $games = Game::whereIn('id', $storedGames)->get();
+
+        // Przekazanie danych do widoku
+        return view('admin.livegame', ['games' => $games]);
+    }
+
+
 
 }

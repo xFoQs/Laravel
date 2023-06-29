@@ -25,6 +25,11 @@ class Game extends Model
         return $this->belongsTo(League::class, 'league_id');
     }
 
+    public function season()
+    {
+        return $this->belongsTo(Season::class);
+    }
+
 
 
 }

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Player;
+use App\Models\Season;
+use App\Models\PlayerSeason;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class PlayerController extends Controller
@@ -14,55 +16,79 @@ class PlayerController extends Controller
 
     public function index(): View
     {
-        $players = DB::table('players')
-            ->join('teams', 'players.team_id', '=', 'teams.id')
-            ->select('players.*', 'teams.name as team_name')
-            ->get();
+        $players = Player::with('seasons')->get();
+
         $teams = Team::all();
-        return view('Admin.players' ,['players' => $players, 'teams' => $teams]);
+        $seasons = Season::with('teams')->get(); // Dodane pobranie klubów dla sezonów
+
+        return view('Admin.players', ['players' => $players, 'teams' => $teams, 'seasons' => $seasons]);
     }
 
 
     public function store(Request $request)
     {
-        $players = new Player();
-        $players->name = $request->input('name');
-        $players->surname = $request->input('surname');
-        $players->birth_date = $request->input('birth_date');
-        $players->position = $request->input('position');
-        $teamName = $request->input('team_id');
-        $team = Team::where('name', $teamName)->first();
-        $teamId = $team ? $team->id : null;
-        $players->team_id = $teamId;
-        $players->save();
+        $player = new Player();
+        $player->name = $request->input('name');
+        $player->surname = $request->input('surname');
+        $player->birth_date = $request->input('birth_date');
+        $player->position = $request->input('position');
+        $player->country = $request->input('country');
+        $player->save();
+
+        $seasonNames = $request->input('season_name');
+        $teamIds = $request->input('season_team_id');
+
+        for ($i = 0; $i < count($seasonNames); $i++) {
+            $seasonId = $seasonNames[$i];
+            $teamId = $teamIds[$i];
+
+            $player->seasons()->attach($seasonId, ['team_id' => $teamId]);
+
+            // Aktualizacja aktualnego klubu (team_id) dla zawodnika
+            $player->team_id = $teamId;
+            $player->save();
+        }
 
         return redirect()->intended('players')->withSuccess('Rekord został dodany pomyślnie');
     }
 
-    public function show(Player $player): View
-    {
-        return view('admin.players', compact('player'));
-    }
-
-
     public function update(Request $request)
     {
+        $player = Player::find($request->id);
 
-        $players = Player::findOrFail($request->id);
+        if ($player) {
+            $player->name = $request->name;
+            $player->surname = $request->surname;
+            $player->birth_date = $request->birth_date;
+            $player->position = $request->position;
+            $player->country = $request->country;
+            $player->team_id = $request->input('season_team_id.' . $player->id . '.0'); // Pobierz wartość pierwszego elementu z season_team_id
+            $player->save();
 
-        $players->name = $request->input('name');
-        $players->surname = $request->input('surname');
-        $players->birth_date = $request->input('birth_date');
-        $players->position = $request->input('position');
-        $teamName = $request->input('team_id');
-        $team = Team::where('name', $teamName)->first();
-        $teamId = $team ? $team->id : null;
-        $players->team_id = $teamId;
+            // Aktualizuj dane kariery zawodnika
+            $seasonNames = $request->input('season_name.' . $player->id, []);
+            $seasonTeamIds = $request->input('season_team_id.' . $player->id, []);
 
-        $players->save();
+            // Usuń stare dane kariery zawodnika
+            PlayerSeason::where('player_id', $player->id)->delete();
 
-        return redirect()->intended('players')->withUpdate('Rekord został dodany pomyślnie');
+            // Dodaj nowe dane kariery zawodnika
+            foreach ($seasonNames as $key => $seasonName) {
+                $seasonTeamId = $seasonTeamIds[$key];
 
+                if (!empty($seasonName) && !empty($seasonTeamId)) {
+                    PlayerSeason::create([
+                        'player_id' => $player->id,
+                        'season_id' => $seasonName,
+                        'team_id' => $seasonTeamId,
+                    ]);
+                }
+            }
+
+            return redirect()->back()->with('success', 'Dane zawodnika zostały zaktualizowane.');
+        }
+
+        return redirect()->back()->with('error', 'Nie znaleziono zawodnika o podanym identyfikatorze.');
     }
 
     public function destroy(Request $id)
