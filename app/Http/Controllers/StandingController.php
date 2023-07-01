@@ -10,7 +10,7 @@ class StandingController extends Controller
 {
     public function index()
     {
-        $leagueName = "A klasa podkarpacka";
+        $leagueName = "Klasa okręgowa podkarpacka";
 
         $teams = Team::whereHas('league', function ($query) use ($leagueName) {
             $query->where('name', $leagueName);

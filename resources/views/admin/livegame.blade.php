@@ -92,6 +92,7 @@
             background-color: white;
             color: #4f4f4f;
             width: 100%;
+            margin: 0px;
             padding: 12px 10px;
             text-align: center;
         }
@@ -117,6 +118,17 @@
             width: 100%;
             padding: 10px;
         }
+
+        .select2-selection__rendered {
+            line-height: 43px !important;
+        }
+        .select2-container .select2-selection--single {
+            height: 45px !important;
+        }
+        .select2-selection__arrow {
+            height: 45px !important;
+        }
+
 
     </style>
 
@@ -168,95 +180,95 @@
     <!-- Tutaj zostaną wyświetlone dane meczu -->
 </div>
 
-<div style="display: flex; padding-top: 3rem; justify-content: space-between; padding-bottom: 6rem;">
+<div style="display: flex; padding-top: 3rem; justify-content: space-between; padding-bottom: 15rem;">
     <div>
-        <div id="form-section" style="display: none; align-content: center; padding: 1px; margin: 1px; padding-left: 2rem;">
-            <table class="btn-group btn-group-table" data-toggle="buttons">
-                <tr>
-                    <td>
-                        <label class="btn btn-secondary">
-                            <input type="radio" name="options" id="option1">
-                            <span>Informacje</span>
-                        </label>
-                    </td>
-                    <td>
-                        <label class="btn btn-secondary">
-                            <input type="radio" name="options" id="option2">
-                            <span>Bramka</span>
-                        </label>
-                    </td>
-                    <td>
-                        <label class="btn btn-secondary">
-                            <input type="radio" name="options" id="option3">
-                            <span>Żółta kartka</span>
-                        </label>
-                    </td>
-                    <td>
-                        <label class="btn btn-secondary">
-                            <input type="radio" name="options" id="option4">
-                            <span>2x Żółta kartka</span>
-                        </label>
-                    </td>
-                    <td>
-                        <label class="btn btn-secondary">
-                            <input type="radio" name="options" id="option5">
-                            <span>Niewykorzystany rzut karny</span>
-                        </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3">
-                        <label class="btn btn-secondary" style="width: 100%;">
-                            <input type="radio" name="options" id="option6">
-                            <span>Bramka samobójcza</span>
-                        </label>
-                    </td>
-                    <td colspan="3">
-                        <label class="btn btn-secondary" style="width: 100%;">
-                            <input type="radio" name="options" id="option7">
-                            <span>Zmiana</span>
-                        </label>
-                    </td>
-                </tr>
-            </table>
+        <form id="goal-form" action="{{ route('goals.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="game_id" value="">
+            <div id="form-section" style="display: none; align-content: center; padding: 1px; margin: 1px; padding-left: 2rem;">
+                <table class="btn-group btn-group-table" data-toggle="buttons">
+                    <tr>
+                        <td>
+                            <label class="btn btn-secondary">
+                                <input type="radio" name="options" value="1">
+                                <span>Informacje</span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="btn btn-secondary">
+                                <input type="radio" name="options" value="2">
+                                <span>Bramka</span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="btn btn-secondary">
+                                <input type="radio" name="options" value="3">
+                                <span>Żółta kartka</span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="btn btn-secondary">
+                                <input type="radio" name="options" value="4">
+                                <span>2x Żółta kartka</span>
+                            </label>
+                        </td>
+                        <td>
+                            <label class="btn btn-secondary">
+                                <input type="radio" name="options" value="5">
+                                <span>Niewykorzystany rzut karny</span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <label class="btn btn-secondary" style="width: 100%;">
+                                <input type="radio" name="options" value="6">
+                                <span>Bramka samobójcza</span>
+                            </label>
+                        </td>
+                        <td colspan="3">
+                            <label class="btn btn-secondary" style="width: 100%;">
+                                <input type="radio" name="options" value="7">
+                                <span>Zmiana</span>
+                            </label>
+                        </td>
+                    </tr>
+                </table>
 
-            <div id="team_action" style="padding-top: 1rem; display: none;">
-                <div class="input-group">
-                    <label class="form-check-label" style="display: block; margin-bottom: 0.5rem;">
-                        <input type="radio" class="form-check-input time-input" name="team" value="${response.team1Name}" required>
-                        ${response.team1Name}
-                    </label>
-                    <label class="form-check-label" style="display: block;">
-                        <input type="radio" class="form-check-input time-input" name="team" value="${response.team2Name}" required>
-                        ${response.team2Name}
-                    </label>
+                <div id="team_action" style="padding-top: 1rem; display: none;">
+                    <div class="input-group">
+                        <label class="form-check-label" style="display: block; margin-bottom: 0.5rem;">
+                            <input type="radio" class="form-check-input time-input" name="team" value="" required>
+                        </label>
+                        <label class="form-check-label" style="display: block;">
+                            <input type="radio" class="form-check-input time-input" name="team" value="" required>
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="time-input-container" style="padding-top: 1rem;">
-                <input type="text" class="time-input" placeholder="Minuta">
-            </div>
+                <div class="time-input-container" style="padding-top: 1rem;">
+                    <input type="text" id="minute_input" class="time-input" name="minute" placeholder="Minuta" value="" required>
+                </div>
 
-            <div class="input-group" style="margin-top: 1rem;">
-                <select id="player_select" class="form-control" required>
-                    <option></option>
-                </select>
+                <div class="input-group" style="margin-top: 1rem; padding-bottom: 1rem;">
+                    <select id="player_select" class="form-control" name="player_id">
+                        <option></option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Wyślij</button>
             </div>
+        </form>
 
         </div>
+
+    <div id="preview-section" style="display: none; align-content: center;">
+        <h1>Podgląd</h1>
+
     </div>
 
     <div>
-        <div id="preview-section" style="display: none; align-content: center;">
-            <h1>Podgląd</h1>
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
-
-            </div>
-            <br> <!-- Nowa linia -->
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
-
-            </div>
         </div>
     </div>
 </div>
@@ -276,17 +288,20 @@
 
 <script>
     $(document).ready(function() {
+        var activeGameId;
         $('.panel').click(function() {
             $('.panel').removeClass('active');
             $(this).addClass('active');
 
-            var activeGameId = $(this).data('game-id');
+            activeGameId = $(this).data('game-id');
 
             // Aktualizuj dane w divie "game-data-container"
             updateGameData(activeGameId);
 
             $('#form-section').show();
             $('#preview-section').show();
+
+            // Sprawdź, czy opcja radio z drużyną została zaznaczona po zmianie panelu
         });
 
         function updateGameData(activeGameId) {
@@ -294,55 +309,97 @@
             $.ajax({
                 url: '/admin/livegame/' + activeGameId, // Endpoint do pobrania danych meczu
                 method: 'GET',
+                data: { activeGameId: activeGameId },
                 success: function(response) {
                     // Zaktualizuj zawartość diva "game-data-container" na podstawie odpowiedzi z serwera
                     var gameDataContainer = $('#game-data-container');
+                    $('input[name="game_id"]').val(activeGameId);
                     gameDataContainer.html(`
-                        <div style="padding-top: 3rem; display: flex; align-items: center; justify-content: center;">
-                            <div class="match" style="width: 90%;">
-                                <div class="match-header">
-                                    <h2 class="match-tournament">${response.league}   (${response.season})</h2>
-                                    <span class="match-tournament">${response.round}</span>
+                    <div style="padding-top: 3rem; display: flex; align-items: center; justify-content: center;">
+                        <div class="match" style="width: 90%;">
+                            <div class="match-header">
+                                <h2 class="match-tournament">${response.league}   (${response.season})</h2>
+                                <span class="match-tournament">${response.round}</span>
+                            </div>
+                            <div class="match-content">
+                                <div class="column">
+                                    <div class="team">
+                                        <h2 class="team-name">${response.team1Name}</h2>
+                                    </div>
                                 </div>
-                                <div class="match-content">
-                                    <div class="column">
-                                        <div class="team">
-                                            <h2 class="team-name">${response.team1Name}</h2>
+                                <div class="column">
+                                    <div class="match-details">
+                                        <div class="match-score">
+                                            <span class="match-score-number">${response.result1 !== null ? response.result1 : '0'}</span>
+                                            <span class="match-score-divider">:</span>
+                                            <span class="match-score-number">${response.result2 !== null ? response.result2 : '0'}</span>
                                         </div>
                                     </div>
-                                    <div class="column">
-                                        <div class="match-details">
-                                            <div class="match-score">
-                                                <span class="match-score-number">${response.result1 !== null ? response.result1 : '?'}</span>
-                                                <span class="match-score-divider">:</span>
-                                                <span class="match-score-number">${response.result2 !== null ? response.result2 : '?'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="column">
-                                        <div class="team">
-                                            <div class="team-logo">
-                                                <h2 class="team-name">${response.team2Name}</h2>
-                                            </div>
+                                </div>
+                                <div class="column">
+                                    <div class="team">
+                                        <div class="team-logo">
+                                            <h2 class="team-name">${response.team2Name}</h2>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    `);
+                    </div>
+                `);
+
+                    var previewSection = $('#preview-section');
+                    var previewContent = '';
+
+                    response.goals.sort(function(a, b) {
+                        return b.minute - a.minute;
+                    });
+
+                    response.goals.forEach(function(goal) {
+                        var teamName = goal.team_id === response.team1Id ? response.team1Name : response.team2Name;
+                        var playerName = goal.player && goal.player.name ? goal.player.name : 'Nieznany';
+                        var playerSurname = goal.player && goal.player.surname ? goal.player.surname : 'Strzelec';
+                        var minute = goal.minute !== null ? goal.minute : '';
+                        var goalId = goal.id;
+
+                        previewContent += `
+                        <div class="preview" style="padding: 4px; display: flex; justify-content: space-between;">
+                            <div style="padding-right:4rem;">
+                                <span style="font-size: 16px; font-weight: bold">${minute}'</span>
+                                <span class="badge badge-primary" style="font-size: 14px;">Bramka</span> w drużynie
+                                <span class="badge badge-secondary" style="font-size: 14px;">${teamName}</span> dla
+                                <span class="badge badge-primary" style="font-size: 14px;">${playerName} ${playerSurname}</span>
+                            </div>
+                            <button class="btn btn-danger btn-sm" data-goal-id="${goalId}" onclick="deleteGoal(this)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                    });
+
+                    previewSection.html(previewContent);
+                    previewSection.show();
+
                     var gameSelect = $('#team_action');
                     gameSelect.html(`
-                        <div class="input-group" style="display: flex; justify-content: space-around;">
-        <label class="form-check-label" style="display: block; margin-bottom: 0.5rem;">
-            <input type="radio" class="form-check-input time-input" name="team" value="${response.team1Id}" required>
-            ${response.team1Name}
-        </label>
-        <label class="form-check-label" style="display: block;">
-            <input type="radio" class="form-check-input time-input" name="team" value="${response.team2Id}" required>
-            ${response.team2Name}
-        </label>
-    </div>
-                    `);
+                    <div class="input-group" style="display: flex; justify-content: space-around;">
+                        <label class="form-check-label" style="display: block; margin-bottom: 0.5rem;">
+                            <input type="radio" class="form-check-input time-input" name="team" value="${response.team1Id}" required>
+                            ${response.team1Name}
+                        </label>
+                        <label class="form-check-label" style="display: block;">
+                            <input type="radio" class="form-check-input time-input" name="team" value="${response.team2Id}" required>
+                            ${response.team2Name}
+                        </label>
+                    </div>
+                `);
+
+                    var selectedTeamRadio = $('input[name="team"]:checked');
+                    if (selectedTeamRadio.length === 0) {
+                        var playerSelect = $('#player_select');
+                        console.log("kurwo");
+                        playerSelect.empty(); // Wyczyść Select2 przed dodaniem nowych opcji
+                    }
                     // Jeśli wybrany jest klub, załaduj zawodników z wybranego klubu do Select2
                     var selectedTeam = $('input[name="team"]:checked').val();
                     var selectedSeason = response.seasonID; // Pobierz seasonID z odpowiedzi
@@ -396,6 +453,7 @@
                     console.log(error);
                 }
             });
+
         }
 
         $('.toggle-match').click(function() {
@@ -453,6 +511,86 @@
             var expires = "expires=" + date.toUTCString();
             document.cookie = name + "=" + value + "; " + expires + "; path=/";
         }
+
+        var form = document.getElementById('goal-form');
+
+        // Nasłuchuj zdarzenie przesłania formularza
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Zapobiegaj domyślnemu zachowaniu formularza (przeładowaniu strony)
+
+            // Utwórz obiekt FormData z danymi formularza
+            var formData = new FormData(form);
+
+            // Wyślij żądanie AJAX za pomocą metody fetch
+            fetch('/goals', {
+                method: 'POST',
+                body: formData
+            })
+                .then(function(response) {
+                    if (response.ok) {
+                        var minuteInput = document.getElementById('minute_input');
+                        minuteInput.value = '';
+                        updateGameData(activeGameId);
+
+                        // Przykład: Wyświetl komunikat o sukcesie
+                        var successMessage = document.getElementById('successMessage');
+                        successMessage.textContent = 'Dane zostały zapisane.';
+                        successMessage.style.display = 'block';
+                    } else {
+                        // Żądanie zakończone błędem
+                        console.error('Błąd żądania AJAX:', response.status);
+                    }
+                })
+                .catch(function(error) {
+                    // Błąd w trakcie wykonywania żądania
+                    console.error('Błąd żądania AJAX:', error);
+                });
+        });
+
+
+        function deleteGoal(button) {
+            var goalId = button.getAttribute('data-goal-id');
+
+            // Wykonaj żądanie AJAX do usunięcia bramki
+            $.ajax({
+                url: '/delete-goal/' + goalId,  // Zmień ścieżkę URL na odpowiednią dla twojej aplikacji
+                type: 'GET',  // Lub użyj metody 'DELETE', jeśli serwer obsługuje taką metodę
+                success: function(response) {
+
+                    updateGameData(activeGameId);
+
+                    // Sprawdź, czy goalId istnieje w gameData.goals
+                    var goalIndex = gameData.goals.findIndex(function(goal) {
+                        return goal.id === goalId;
+                    });
+
+                    if (goalIndex !== -1) {
+                        // Usuń bramkę z gameData.goals
+                        gameData.goals.splice(goalIndex, 1);
+
+                        // Zaktualizuj wynik w zależności od drużyny, której dotyczyła bramka
+                        if (gameData.team1Id === gameData.goals[goalIndex].team_id) {
+                            gameData.result1--;
+                        } else {
+                            gameData.result2--;
+                        }
+
+                        // Tutaj możesz wykonać dodatkowe operacje po usunięciu bramki
+
+                        // Zaktualizuj widok HTML na podstawie zaktualizowanych danych
+                        updatePreviewSection();
+                        updateGameData();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Obsłuż błąd, jeśli wystąpił
+                    console.log(error);
+                }
+            });
+        }
+        $(document).on('click', '.btn-danger', function() {
+            deleteGoal(this);
+        });
     });
 </script>
 
@@ -477,11 +615,22 @@
         // ...
 
         $('.btn-group-table input[type="radio"]').change(function() {
-            var selectedOption = $('.btn-group-table input[type="radio"]:checked').attr('id');
-            if (selectedOption === 'option1') {
-                $('#team_action').hide();
-            } else {
+            var selectedOption = $('.btn-group-table input[type="radio"]:checked').val();
+
+            if (selectedOption === '2' || selectedOption === '3' || selectedOption === '4' || selectedOption === '5' || selectedOption === '6') {
                 $('#team_action').show();
+            } else {
+                $('#team_action').hide();
+            }
+        });
+
+
+        $('input[name="team"]').change(function() {
+            var selectedTeam = $(this).val();
+            if (selectedTeam) {
+                $('#player_select').show(); // Pokaż pole wyboru
+            } else {
+                $('#player_select').hide(); // Ukryj pole wyboru
             }
         });
 

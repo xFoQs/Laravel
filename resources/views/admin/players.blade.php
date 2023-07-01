@@ -105,26 +105,13 @@
                 <td>{{ $player->name }} {{ $player->surname }}</td>
                 <td>{{ date('d.m.Y', strtotime($player->birth_date)) }}</td>
                 <td>{{ $player->position }}</td>
-                <td>{{$player->team->name}}
-{{--                    @if ($player->playerSeasons()->exists())--}}
-{{--                        @php--}}
-{{--                            $lastPlayerSeason = $player->playerSeasons->last();--}}
-{{--                            $seasonName = $lastPlayerSeason->season->name;--}}
-{{--                            $season = $seasonName;--}}
-{{--                        @endphp--}}
-{{--                        {{ $lastPlayerSeason->team->name }}--}}
-{{--                    @else--}}
-{{--                        Brak klubu--}}
-{{--                    @endif--}}
+                <td>
+                    @if ($currentTeam)
+                        {{ $player->team->name }}
+                    @else
+                        Brak klubu
+                    @endif
                 </td>
-{{--                <td>--}}
-{{--                    @php--}}
-{{--                        $lastPlayerSeason = $player->playerSeasons->last();--}}
-{{--                        $seasonName = $lastPlayerSeason->season->name;--}}
-{{--                        $season = $seasonName;--}}
-{{--                    @endphp--}}
-{{--                    {{$season}}--}}
-{{--                </td>--}}
                 <td>
                     <a data-bs-toggle="modal" data-bs-target="#editplayer{{$player->id}}"><i
                             class="fa-solid fa-pen-to-square" style="color:#4f4f4f; padding-right: 0.5rem;"></i></a>
@@ -311,7 +298,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($player->seasons as $key => $season)
+                                @foreach($player->seasons->sortByDesc('id') as $key => $season)
                                     <tr>
                                         <td>
                                             <select name="season_name[{{$player->id}}][]" class="form-control select2 border rounded border-1" data-live-search="true" data-width="100%" required>

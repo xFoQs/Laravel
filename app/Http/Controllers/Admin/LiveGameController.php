@@ -7,6 +7,8 @@ use App\Models\Game;
 use App\Models\League;
 use App\Models\Season;
 use App\Models\Team;
+use App\Models\Goals;
+use Illuminate\Support\Facades\Session;
 use App\Models\Player;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -54,6 +56,12 @@ class LiveGameController extends Controller
         $players = Player::where('team_id', $game->team1->id)->orWhere('team_id', $game->team2->id)->get(['name', 'id']);
         $gameData['players'] = $players;
 
+        // Pobierz dane z tabeli "goals" na podstawie game_id
+        $goals = Goals::where('game_id', $gameId)->with('player')->get();
+
+        // Dodaj dane goli do $gameData
+        $gameData['goals'] = $goals;
+
         return response()->json($gameData);
     }
 
@@ -64,5 +72,115 @@ class LiveGameController extends Controller
         })->get(['name', 'surname', 'id']);
 
         return response()->json(['players' => $players]);
+    }
+
+
+
+    public function setActiveGame(Request $request, $gameId)
+    {
+        // Pobierz przesłane ID gry
+        $activeGameId = $request->input('game_id');
+
+        // Wykonaj odpowiednie operacje na podstawie przesłanego ID gry
+        // np. zapisz ID gry do sesji lub zmiennej globalnej
+
+        // Zwróć odpowiedź z sukcesem (status 200)
+        return response()->json(['message' => 'ID gry zostało ustawione: ' . $gameId], 200);
+    }
+
+    public function storeGoal(Request $request)
+    {
+
+        $option = $request->input('options');
+
+        switch ($option) {
+            case 2:
+                // Zapisz dane dla opcji "Bramka"
+                $goal = new Goals();
+                $goal->game_id = $request->input('game_id');
+                $goal->player_id = $request->input('player_id');
+                $goal->minute = $request->input('minute');
+                $goal->team_id = $request->input('team');
+                $goal->save();
+
+                // Zlicz bramki dla team_id i game_id
+                $team1GoalsCount = Goals::where('team_id', $request->input('team'))
+                    ->where('game_id', $request->input('game_id'))
+                    ->count();
+
+                $team2GoalsCount = Goals::where('team_id', '!=', $request->input('team'))
+                    ->where('game_id', $request->input('game_id'))
+                    ->count();
+
+                // Sprawdź, czy drużyna posiada już jakiekolwiek gole w danej grze
+                if ($team1GoalsCount === 0 && $team2GoalsCount === 0) {
+                    // Ustaw wartość 0 dla obu drużyn
+                    $team1GoalsCount = 0;
+                    $team2GoalsCount = 0;
+                } else {
+                    // Drużyna ma już gole, nie zmieniaj wartości
+                }
+
+                // Aktualizuj rekord w tabeli "games" na podstawie wyników
+                $game = Game::find($request->input('game_id'));
+                if ($game) {
+                    if ($request->input('team') == $game->team1_id) {
+                        $game->result1 = $team1GoalsCount;
+                        $game->result2 = $team2GoalsCount;
+                    } else {
+                        $game->result1 = $team2GoalsCount;
+                        $game->result2 = $team1GoalsCount;
+                    }
+                    $game->save();
+                }
+                break;
+
+            case 'option3':
+                // Zapisz dane dla opcji "Żółta kartka"
+                // ...
+                break;
+
+            case 'option4':
+                // Zapisz dane dla opcji "2x Żółta kartka"
+                // ...
+                break;
+
+            // Dodaj obsługę pozostałych opcji
+
+            default:
+                // Obsługa dla przypadku, gdy żadna z opcji nie pasuje
+                break;
+        }
+
+        // Zwróć odpowiedź AJAX
+        if ($request->ajax()) {
+            return response()->json(['success' => true]);
+        } else {
+            return redirect()->intended('livegame')->with('success', 'Dane zostały zapisane.');
+        }
+    }
+
+    public function deleteGoal($goalId)
+    {
+        // Znajdź bramkę na podstawie przekazanego ID
+        $goal = Goals::findOrFail($goalId);
+
+        // Znajdź mecz powiązany z bramką
+        $game = Game::findOrFail($goal->game_id);
+
+        // Usuń bramkę
+        $goal->delete();
+
+        // Zaktualizuj wynik w tabeli games
+        $goals = Goals::where('game_id', $game->id)->get();
+        $result1 = $goals->where('team_id', $game->team1->id)->count();
+        $result2 = $goals->where('team_id', $game->team2->id)->count();
+
+        $game->result1 = $result1;
+        $game->result2 = $result2;
+        $game->save();
+
+        // Zwróć odpowiedź w formacie JSON
+        return response()->json(['message' => 'Goal deleted successfully']);
     }
 }
