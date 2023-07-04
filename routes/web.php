@@ -22,10 +22,14 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
+Route::get('tournament', [\App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');
 Route::get('test', [\App\Http\Controllers\GameController::class, 'index'])->name('test');
 Route::get('test2', [\App\Http\Controllers\StandingController::class, 'index'])->name('test2');
+Route::get('/standings', [\App\Http\Controllers\StandingController::class, 'index'])->name('standings');
 Route::get('score', [\App\Http\Controllers\StandingController::class, 'getBalance'])->name('score');
+Route::get('/player', [\App\Http\Controllers\PlayerController::class, 'index'])->name('player.filter');
 Route::get('test3', [\App\Http\Controllers\PlayerController::class, 'index'])->name('test3');
+
 
 Route::get('login', [AuthController::class, 'index'])->name('login');
 Route::post('post-login', [AuthController::class, 'postLogin'])->name('login.post');
@@ -67,8 +71,7 @@ Route::get('/update', [PlayerController::class, 'edit'])->name('player.update');
     Route::get('/admin/livegame/{gameId}', [App\Http\Controllers\Admin\LiveGameController::class, 'updateGameData'])->name('admin.livegame.updateGameData');
 
     Route::get('/players/{teamId}/{seasonId}', [App\Http\Controllers\Admin\LiveGameController::class, 'getPlayersByTeamAndSeason']);
-    Route::get('/goals', [App\Http\Controllers\Admin\LiveGameController::class, 'getGoals'])->name('goals.get');
-    Route::post('/goals', [App\Http\Controllers\Admin\LiveGameController::class, 'storeGoal'])->name('goals.store');
+    Route::get('/goals', [App\Http\Controllers\Admin\LiveGameController::class, 'storeGoal'])->name('goals.store');
 
     Route::get('/delete-goal/{goalId}', [App\Http\Controllers\Admin\LiveGameController::class,'deleteGoal']);
 

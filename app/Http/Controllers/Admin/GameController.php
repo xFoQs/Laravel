@@ -41,6 +41,7 @@ class GameController extends Controller
         $games->round = $request->input('round');
         $games->result1 = $request->input('result1');
         $games->result2 = $request->input('result2');
+        $games->season_id = $request->input('season_id');
         $games->save();
 
         return redirect()->intended('games')->withSuccess('Rekord został dodany pomyślnie');
@@ -70,6 +71,7 @@ class GameController extends Controller
         $game->round = $request->input('round_edit');
         $game->result1 = $request->input('result1');
         $game->result2 = $request->input('result2');
+        $game->season_id = $request->input('season_id');
 
         $game->save();
 

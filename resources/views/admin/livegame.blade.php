@@ -185,6 +185,8 @@
         <form id="goal-form" action="{{ route('goals.store') }}" method="POST">
             @csrf
             <input type="hidden" name="game_id" value="">
+            <input type="hidden" name="league_id" value="">
+            <input type="hidden" name="season_id" value="">
             <div id="form-section" style="display: none; align-content: center; padding: 1px; margin: 1px; padding-left: 2rem;">
                 <table class="btn-group btn-group-table" data-toggle="buttons">
                     <tr>
@@ -314,6 +316,8 @@
                     // Zaktualizuj zawartość diva "game-data-container" na podstawie odpowiedzi z serwera
                     var gameDataContainer = $('#game-data-container');
                     $('input[name="game_id"]').val(activeGameId);
+                    $('input[name="league_id"]').val(response.leagueID);
+                    $('input[name="season_id"]').val(response.seasonID);
                     gameDataContainer.html(`
                     <div style="padding-top: 3rem; display: flex; align-items: center; justify-content: center;">
                         <div class="match" style="width: 90%;">
@@ -351,30 +355,35 @@
                     var previewSection = $('#preview-section');
                     var previewContent = '';
 
-                    response.goals.sort(function(a, b) {
-                        return b.minute - a.minute;
+                    var allEvents = response.goals.concat(response.yellowCards); // Połącz bramki i żółte kartki w jedną tablicę
+
+                    allEvents.sort(function(a, b) {
+                        return b.minute - a.minute; // Sortuj według minuty malejąco
                     });
 
-                    response.goals.forEach(function(goal) {
-                        var teamName = goal.team_id === response.team1Id ? response.team1Name : response.team2Name;
-                        var playerName = goal.player && goal.player.name ? goal.player.name : 'Nieznany';
-                        var playerSurname = goal.player && goal.player.surname ? goal.player.surname : 'Strzelec';
-                        var minute = goal.minute !== null ? goal.minute : '';
-                        var goalId = goal.id;
+                    allEvents.forEach(function(event) {
+                        var teamName = event.team_id === response.team1Id ? response.team1Name : response.team2Name;
+                        var eventType = response.goals.includes(event) ? 'Bramka' : 'Żółta kartka';
+                        var playerName = event.player && event.player.name ? event.player.name : 'Nieznany';
+                        var playerSurname = event.player && event.player.surname ? event.player.surname : 'Zawodnik';
+                        var minute = event.minute !== null ? event.minute : '';
+                        var eventId = event.id;
+
+                        var eventBadgeClass = response.goals.includes(event) ? 'badge-primary' : 'badge-warning';
 
                         previewContent += `
-                        <div class="preview" style="padding: 4px; display: flex; justify-content: space-between;">
-                            <div style="padding-right:4rem;">
-                                <span style="font-size: 16px; font-weight: bold">${minute}'</span>
-                                <span class="badge badge-primary" style="font-size: 14px;">Bramka</span> w drużynie
-                                <span class="badge badge-secondary" style="font-size: 14px;">${teamName}</span> dla
-                                <span class="badge badge-primary" style="font-size: 14px;">${playerName} ${playerSurname}</span>
-                            </div>
-                            <button class="btn btn-danger btn-sm" data-goal-id="${goalId}" onclick="deleteGoal(this)">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    `;
+        <div class="preview" style="padding: 4px; display: flex; justify-content: space-between;">
+            <div style="padding-right:4rem;">
+                <span style="font-size: 16px; font-weight: bold">${minute}'</span>
+                <span class="badge ${eventBadgeClass}" style="font-size: 14px;">${eventType}</span> w drużynie
+                <span class="badge badge-secondary" style="font-size: 14px;">${teamName}</span> dla
+                <span class="badge ${eventBadgeClass}" style="font-size: 14px;">${playerName} ${playerSurname}</span>
+            </div>
+            <button class="btn btn-danger btn-sm" data-event-id="${eventId}" onclick="deleteEvent(this)">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    `;
                     });
 
                     previewSection.html(previewContent);
@@ -514,28 +523,21 @@
 
         var form = document.getElementById('goal-form');
 
-        // Nasłuchuj zdarzenie przesłania formularza
+// Nasłuchuj zdarzenie przesłania formularza
         form.addEventListener('submit', function(event) {
             event.preventDefault(); // Zapobiegaj domyślnemu zachowaniu formularza (przeładowaniu strony)
 
-            // Utwórz obiekt FormData z danymi formularza
-            var formData = new FormData(form);
+            // Utwórz obiekt URLSearchParams z danymi formularza
+            var formData = new URLSearchParams(new FormData(form));
 
             // Wyślij żądanie AJAX za pomocą metody fetch
-            fetch('/goals', {
-                method: 'POST',
-                body: formData
-            })
+            fetch('/goals?' + formData.toString())
                 .then(function(response) {
                     if (response.ok) {
                         var minuteInput = document.getElementById('minute_input');
                         minuteInput.value = '';
                         updateGameData(activeGameId);
 
-                        // Przykład: Wyświetl komunikat o sukcesie
-                        var successMessage = document.getElementById('successMessage');
-                        successMessage.textContent = 'Dane zostały zapisane.';
-                        successMessage.style.display = 'block';
                     } else {
                         // Żądanie zakończone błędem
                         console.error('Błąd żądania AJAX:', response.status);
@@ -549,38 +551,43 @@
 
 
         function deleteGoal(button) {
-            var goalId = button.getAttribute('data-goal-id');
+            var goalId = button.getAttribute('data-event-id');
 
             // Wykonaj żądanie AJAX do usunięcia bramki
             $.ajax({
                 url: '/delete-goal/' + goalId,  // Zmień ścieżkę URL na odpowiednią dla twojej aplikacji
                 type: 'GET',  // Lub użyj metody 'DELETE', jeśli serwer obsługuje taką metodę
                 success: function(response) {
-
                     updateGameData(activeGameId);
 
-                    // Sprawdź, czy goalId istnieje w gameData.goals
+                    // Sprawdź, czy goalId istnieje w gameData.goals lub gameData.yellowCards
                     var goalIndex = gameData.goals.findIndex(function(goal) {
                         return goal.id === goalId;
+                    });
+                    var yellowCardIndex = gameData.yellowCards.findIndex(function(card) {
+                        return card.id === goalId;
                     });
 
                     if (goalIndex !== -1) {
                         // Usuń bramkę z gameData.goals
+                        var goal = gameData.goals[goalIndex];
                         gameData.goals.splice(goalIndex, 1);
 
                         // Zaktualizuj wynik w zależności od drużyny, której dotyczyła bramka
-                        if (gameData.team1Id === gameData.goals[goalIndex].team_id) {
+                        if (goal.team_id === gameData.team1Id) {
                             gameData.result1--;
                         } else {
                             gameData.result2--;
                         }
-
-                        // Tutaj możesz wykonać dodatkowe operacje po usunięciu bramki
-
-                        // Zaktualizuj widok HTML na podstawie zaktualizowanych danych
-                        updatePreviewSection();
-                        updateGameData();
+                    } else if (yellowCardIndex !== -1) {
+                        // Usuń żółtą kartkę z gameData.yellowCards
+                        gameData.yellowCards.splice(yellowCardIndex, 1);
+                        // Tutaj możesz wykonać dodatkowe operacje po usunięciu żółtej kartki
                     }
+
+                    // Zaktualizuj widok HTML na podstawie zaktualizowanych danych
+                    updatePreviewSection();
+                    updateGameData();
                 },
                 error: function(xhr, status, error) {
                     // Obsłuż błąd, jeśli wystąpił

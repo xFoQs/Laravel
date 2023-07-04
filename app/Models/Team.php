@@ -26,17 +26,22 @@ class Team extends Model
         return $this->belongsTo(League::class, 'league_id');
     }
 
+    public function gamesAsTeam1()
+    {
+        return $this->hasMany(Game::class, 'team1_id');
+    }
 
-    public function getGamesAttribute()
+    public function getGamesAttribute($selectedSeasonId)
     {
         return Game::where(function($query) {
             $query->where('team1_id', $this->attributes['id'])->orWhere('team2_id', $this->attributes['id']);
         })
-        ->whereNotNull('result1')
-        ->count();
+            ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
     }
 
-    public function getWonAttribute()
+    public function getWonAttribute($selectedSeasonId)
     {
         return Game::whereNotNull('result1')
             ->where(function($query) {
@@ -46,10 +51,11 @@ class Team extends Model
                     $query2->where('team2_id', $this->attributes['id'])->whereRaw('result1 < result2');
                 });
             })
+            ->where('season_id', $selectedSeasonId)
             ->count();
     }
 
-    public function getTiedAttribute()
+    public function getTiedAttribute($selectedSeasonId)
     {
         return Game::whereNotNull('result1')
             ->whereRaw('result1 = result2')
@@ -57,10 +63,11 @@ class Team extends Model
                 $query->where('team1_id', $this->attributes['id'])
                     ->orWhere('team2_id', $this->attributes['id']);
             })
+            ->where('season_id', $selectedSeasonId)
             ->count();
     }
 
-    public function getLostAttribute()
+    public function getLostAttribute($selectedSeasonId)
     {
         return Game::whereNotNull('result1')
             ->where(function($query) {
@@ -70,31 +77,37 @@ class Team extends Model
                     $query2->where('team2_id', $this->attributes['id'])->whereRaw('result1 > result2');
                 });
             })
+            ->where('season_id', $selectedSeasonId)
             ->count();
     }
 
-    public function getPointsAttribute(){
-        return $this->getWonAttribute() * 3 + $this->getTiedAttribute() * 1;
+    public function getPointsAttribute($selectedSeasonId)
+    {
+        return $this->getWonAttribute($selectedSeasonId) * 3 + $this->getTiedAttribute($selectedSeasonId) * 1;
     }
 
-    public function getGoalStats()
+    public function getGoalStats($selectedSeasonId)
     {
         $teamId = $this->attributes['id'];
 
         $scoredGoals = Game::where('team1_id', $teamId)
             ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
             ->sum('result1');
 
         $concededGoals = Game::where('team1_id', $teamId)
             ->whereNotNull('result2')
+            ->where('season_id', $selectedSeasonId)
             ->sum('result2');
 
         $scoredGoals += Game::where('team2_id', $teamId)
             ->whereNotNull('result2')
+            ->where('season_id', $selectedSeasonId)
             ->sum('result2');
 
         $concededGoals += Game::where('team2_id', $teamId)
             ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
             ->sum('result1');
 
         return [

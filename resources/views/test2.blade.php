@@ -8,7 +8,27 @@
                     Standings Table
                 </h3>
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <form id="standings-form" action="{{ route('standings') }}" method="GET">
+                        <div class="form-group">
+                            <label for="league">Liga:</label>
+                            <select name="league" id="league" class="form-control">
+                                @foreach($leagues as $league)
+                                    <option value="{{ $league->id }}" {{ $selectedLeagueId == $league->id ? 'selected' : '' }}>{{ $league->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="season">Sezon:</label>
+                            <select name="season" id="season" class="form-control">
+                                @foreach($seasons as $season)
+                                    <option value="{{ $season->id }}" {{ $selectedSeasonId == $season->id ? 'selected' : '' }}>{{ $season->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button> <!-- Dodaj przycisk Submit -->
+                    </form>
+                    <hr>
+                    <div class="table-responsive" id="standings-table">
                         <table class="table table-borderless">
                             <thead class="table-success">
                             <tr>
@@ -24,15 +44,15 @@
                             <tbody>
                             @foreach($teams as $team)
                                 @php
-                                    $goalStats = $team->getGoalStats();
+                                    $goalStats = $team->getGoalStats($selectedSeasonId);
                                 @endphp
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ $team->name }}</td>
-                                    <td>{{ $team->won }}</td>
-                                    <td>{{ $team->tied }}</td>
-                                    <td>{{ $team->lost }}</td>
-                                    <td>{{ $team->points }}</td>
+                                    <td>{{ $team->getWonAttribute($selectedSeasonId) }}</td>
+                                    <td>{{ $team->getTiedAttribute($selectedSeasonId) }}</td>
+                                    <td>{{ $team->getLostAttribute($selectedSeasonId) }}</td>
+                                    <td>{{ $team->getPointsAttribute($selectedSeasonId) }}</td>
                                     <td>{{ $goalStats['scored'] }}:{{ $goalStats['conceded'] }}</td>
                                 </tr>
                             @endforeach
@@ -43,4 +63,18 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            // Nasłuchuj zdarzeń zmiany wartości w selectach
+            document.getElementById('league').addEventListener('change', function() {
+                document.getElementById('standings-form').submit(); // Wyślij formularz po zmianie wartości w select
+            });
+
+            document.getElementById('season').addEventListener('change', function() {
+                document.getElementById('standings-form').submit(); // Wyślij formularz po zmianie wartości w select
+            });
+        </script>
+    @endpush
+
 @endsection

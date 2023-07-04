@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Game;
 use App\Models\League;
+use App\Models\Season;
 use App\Models\Team;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
@@ -18,8 +19,9 @@ class TeamController extends Controller
     {
         $teams = Team::all();
         $leagues = League::all();
+        $seasons = Season::all();
 
-        return view('admin.teams', compact('teams','leagues'));
+        return view('admin.teams', compact('teams','leagues','seasons'));
     }
 
     public function create(): View

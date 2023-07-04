@@ -26,6 +26,16 @@ class Player extends Model
             ->withPivot('season_id');
     }
 
+    public function games()
+    {
+        return $this->belongsToMany(Game::class, 'game_player', 'player_id', 'game_id');
+    }
+
+    public function goals()
+    {
+        return $this->hasMany(Goals::class);
+    }
+
     public function playerSeasons()
     {
         return $this->hasMany(PlayerSeason::class);

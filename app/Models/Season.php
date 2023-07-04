@@ -27,4 +27,14 @@ class Season extends Model
         return $this->belongsToMany(Team::class, 'player_seasons', 'season_id', 'team_id')
             ->withPivot('player_id');
     }
+
+    public function games()
+    {
+        return $this->hasManyThrough(Game::class, PlayerSeason::class, 'season_id', 'team_id', 'id', 'team_id');
+    }
+
+    public function goals()
+    {
+        return $this->hasManyThrough(Goals::class, Game::class, 'season_id', 'game_id');
+    }
 }

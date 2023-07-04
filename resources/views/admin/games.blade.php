@@ -117,7 +117,7 @@
                 <td>{{ $localizedTime }}</td>
                 <td>{{ $game->season->name ?? 'Brak sezonu' }}</td>
                 <td>
-                    @if (!empty($game->result1) && !empty($game->result2))
+                    @if ($game->result1 !== null && $game->result2 !== null)
                         {{ $game->result1 }}:{{ $game->result2 }}
                     @endif
                 </td>
