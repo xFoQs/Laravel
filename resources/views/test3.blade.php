@@ -17,7 +17,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="padding-bottom: 10px;">
                             <label for="season">Sezon:</label>
                             <select name="season" id="season" class="form-control">
                                 @foreach($seasons as $season)
@@ -25,7 +25,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Filtruj</button>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Filtruj</button>
                     </div>
                 </form>
                 <ul class="list-group list-group-flush">

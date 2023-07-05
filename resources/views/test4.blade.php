@@ -17,7 +17,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="padding-bottom: 10px;">
                             <label for="season">Sezon:</label>
                             <select name="season" id="season" class="form-control">
                                 @foreach($seasons as $season)
@@ -25,12 +25,12 @@
                                 @endforeach
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Filtruj</button>
                     </form>
                     <hr>
                     <div class="table-responsive" id="standings-table">
                         <table class="table table-borderless">
-                            <thead class="table-success">
+                            <thead class="table-primary">
                             <tr>
                                 <th scope="col">Drużyna</th>
                                 <th scope="col">1-15</th>
@@ -45,12 +45,30 @@
                             @foreach ($teams as $team)
                                 <tr>
                                     <td>{{ $team->name }}</td>
-                                    <td>{{ $goalsCount[$team->id]['1-15'] }}</td>
-                                    <td>{{ $goalsCount[$team->id]['16-30'] }}</td>
-                                    <td>{{ $goalsCount[$team->id]['31-45'] }}</td>
-                                    <td>{{ $goalsCount[$team->id]['46-60'] }}</td>
-                                    <td>{{ $goalsCount[$team->id]['61-75'] }}</td>
-                                    <td>{{ $goalsCount[$team->id]['76-90'] }}</td>
+                                    <td>
+                                        <span class="badge badge-success">{{ $goalsCount[$team->id]['1-15']['scored'] }}</span>
+                                        <span class="badge rounded-pill badge-danger me-1">{{ $goalsCount[$team->id]['1-15']['conceded'] }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">{{ $goalsCount[$team->id]['16-30']['scored'] }}</span>
+                                        <span class="badge rounded-pill badge-danger me-1">{{ $goalsCount[$team->id]['16-30']['conceded'] }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">{{ $goalsCount[$team->id]['31-45']['scored'] }}</span>
+                                        <span class="badge rounded-pill badge-danger me-1">{{ $goalsCount[$team->id]['31-45']['conceded'] }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">{{ $goalsCount[$team->id]['46-60']['scored'] }}</span>
+                                        <span class="badge rounded-pill badge-danger me-1">{{ $goalsCount[$team->id]['46-60']['conceded'] }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">{{ $goalsCount[$team->id]['61-75']['scored'] }}</span>
+                                        <span class="badge rounded-pill badge-danger me-1">{{ $goalsCount[$team->id]['61-75']['conceded'] }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-success">{{ $goalsCount[$team->id]['76-90']['scored'] }}</span>
+                                        <span class="badge rounded-pill badge-danger me-1">{{ $goalsCount[$team->id]['76-90']['conceded'] }}</span>
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -62,4 +80,3 @@
     </div>
 
 @endsection
-

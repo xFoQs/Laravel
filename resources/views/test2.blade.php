@@ -17,7 +17,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="padding-bottom: 10px;">
                             <label for="season">Sezon:</label>
                             <select name="season" id="season" class="form-control">
                                 @foreach($seasons as $season)
@@ -25,12 +25,12 @@
                                 @endforeach
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button> <!-- Dodaj przycisk Submit -->
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Filtruj</button> <!-- Dodaj przycisk Submit -->
                     </form>
                     <hr>
                     <div class="table-responsive" id="standings-table">
                         <table class="table table-borderless">
-                            <thead class="table-success">
+                            <thead class="table-primary">
                             <tr>
                                 <th scope="col">No</th>
                                 <th scope="col">Drużyna</th>

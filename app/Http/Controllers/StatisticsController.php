@@ -34,12 +34,30 @@ class StatisticsController extends Controller
 
         foreach ($teams as $team) {
             $goalsCount[$team->id] = [
-                '1-15' => 0,
-                '16-30' => 0,
-                '31-45' => 0,
-                '46-60' => 0,
-                '61-75' => 0,
-                '76-90' => 0,
+                '1-15' => [
+                    'scored' => 0,
+                    'conceded' => 0,
+                ],
+                '16-30' => [
+                    'scored' => 0,
+                    'conceded' => 0,
+                ],
+                '31-45' => [
+                    'scored' => 0,
+                    'conceded' => 0,
+                ],
+                '46-60' => [
+                    'scored' => 0,
+                    'conceded' => 0,
+                ],
+                '61-75' => [
+                    'scored' => 0,
+                    'conceded' => 0,
+                ],
+                '76-90' => [
+                    'scored' => 0,
+                    'conceded' => 0,
+                ],
             ];
         }
 
@@ -55,25 +73,27 @@ class StatisticsController extends Controller
 
             foreach ($goals as $goal) {
                 $minute = $goal->minute;
+                $scoringTeam = $goal->team_id;
+                $opposingTeam = $team1->id === $scoringTeam ? $team2->id : $team1->id;
 
                 if ($minute >= 1 && $minute <= 15) {
-                    $goalsCount[$team1->id]['1-15']++;
-                    $goalsCount[$team2->id]['1-15']++;
+                    $goalsCount[$scoringTeam]['1-15']['scored']++;
+                    $goalsCount[$opposingTeam]['1-15']['conceded']++;
                 } elseif ($minute >= 16 && $minute <= 30) {
-                    $goalsCount[$team1->id]['16-30']++;
-                    $goalsCount[$team2->id]['16-30']++;
+                    $goalsCount[$scoringTeam]['16-30']['scored']++;
+                    $goalsCount[$opposingTeam]['16-30']['conceded']++;
                 } elseif ($minute >= 31 && $minute <= 45) {
-                    $goalsCount[$team1->id]['31-45']++;
-                    $goalsCount[$team2->id]['31-45']++;
+                    $goalsCount[$scoringTeam]['31-45']['scored']++;
+                    $goalsCount[$opposingTeam]['31-45']['conceded']++;
                 } elseif ($minute >= 46 && $minute <= 60) {
-                    $goalsCount[$team1->id]['46-60']++;
-                    $goalsCount[$team2->id]['46-60']++;
+                    $goalsCount[$scoringTeam]['46-60']['scored']++;
+                    $goalsCount[$opposingTeam]['46-60']['conceded']++;
                 } elseif ($minute >= 61 && $minute <= 75) {
-                    $goalsCount[$team1->id]['61-75']++;
-                    $goalsCount[$team2->id]['61-75']++;
+                    $goalsCount[$scoringTeam]['61-75']['scored']++;
+                    $goalsCount[$opposingTeam]['61-75']['conceded']++;
                 } elseif ($minute >= 76 && $minute <= 130) {
-                    $goalsCount[$team1->id]['76-90']++;
-                    $goalsCount[$team2->id]['76-90']++;
+                    $goalsCount[$scoringTeam]['76-90']['scored']++;
+                    $goalsCount[$opposingTeam]['76-90']['conceded']++;
                 }
             }
         }
