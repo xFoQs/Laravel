@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\GameController;
 use App\Http\Controllers\Admin\PlayerController;
 use App\Http\Controllers\Admin\TeamController;
+use App\Http\Controllers\StatisticsController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -29,6 +30,9 @@ Route::get('/standings', [\App\Http\Controllers\StandingController::class, 'inde
 Route::get('score', [\App\Http\Controllers\StandingController::class, 'getBalance'])->name('score');
 Route::get('/player', [\App\Http\Controllers\PlayerController::class, 'index'])->name('player.filter');
 Route::get('test3', [\App\Http\Controllers\PlayerController::class, 'index'])->name('test3');
+Route::get('/statistics', [\App\Http\Controllers\StatisticsController::class, 'index'])->name('statistics');
+Route::get('test4', [\App\Http\Controllers\StatisticsController::class, 'index'])->name('test4');
+
 
 
 Route::get('login', [AuthController::class, 'index'])->name('login');

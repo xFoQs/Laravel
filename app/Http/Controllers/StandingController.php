@@ -9,6 +9,7 @@ use App\Models\League;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class StandingController extends Controller
 {
@@ -20,13 +21,16 @@ class StandingController extends Controller
         $selectedLeagueId = $request->input('league', $leagues->first()->id);
         $selectedSeasonId = $request->input('season', $seasons->max('id'));
 
-        $teams = Team::whereHas('league', function ($query) use ($selectedLeagueId) {
-            $query->where('id', $selectedLeagueId);
-        })->with('league')->get();
-
-        $teams = $teams->sortByDesc(function ($team) use ($selectedSeasonId) {
-            return $team->getPointsAttribute($selectedSeasonId);
-        });
+        $teams = Team::where(function ($query) use ($selectedLeagueId, $selectedSeasonId) {
+            $query->whereExists(function ($subQuery) use ($selectedLeagueId, $selectedSeasonId) {
+                $subQuery->select(DB::raw(1))
+                    ->from('games')
+                    ->whereRaw('(teams.id = games.team1_id OR teams.id = games.team2_id)')
+                    ->where('games.league_id', $selectedLeagueId)
+                    ->where('games.season_id', $selectedSeasonId);
+            });
+        })
+            ->get();
 
         return view('test2', [
             'teams' => $teams,

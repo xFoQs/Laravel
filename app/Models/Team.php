@@ -16,8 +16,9 @@ class Team extends Model
         return $this->hasMany(Player::class);
     }
 
-    public function games(){
-        return $this->hasMany(Game::class, 'team_id');
+    public function games()
+    {
+        return $this->hasMany(Game::class, 'team1_id')->orWhere('team2_id', $this->id);
     }
 
 
@@ -26,10 +27,16 @@ class Team extends Model
         return $this->belongsTo(League::class, 'league_id');
     }
 
-    public function gamesAsTeam1()
+    public function homeGames()
     {
         return $this->hasMany(Game::class, 'team1_id');
     }
+
+    public function awayGames()
+    {
+        return $this->hasMany(Game::class, 'team2_id');
+    }
+
 
     public function getGamesAttribute($selectedSeasonId)
     {

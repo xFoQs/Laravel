@@ -24,6 +24,9 @@
         <li class="nav-item">
             <a class="nav-link text-white" href="{{ route('test2') }}">standings</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link text-white" href="{{ route('test4') }}">statystyki</a>
+        </li>
     </ul>
 
     @yield('content')
