@@ -24,6 +24,18 @@ class StandingController extends Controller
         $selectedLeague = League::find($selectedLeagueId);
         $selectedSeason = Season::find($selectedSeasonId);
 
+        $allGames = Game::where('league_id', $selectedLeagueId)
+            ->where('season_id', $selectedSeasonId)
+            ->get();
+
+        $homeGames = $allGames->filter(function ($game) {
+            return $game->team1_id == $game->home_team_id;
+        });
+
+        $awayGames = $allGames->filter(function ($game) {
+            return $game->team2_id == $game->home_team_id;
+        });
+
         $teams = Team::where(function ($query) use ($selectedLeagueId, $selectedSeasonId) {
             $query->whereExists(function ($subQuery) use ($selectedLeagueId, $selectedSeasonId) {
                 $subQuery->select(DB::raw(1))
@@ -38,8 +50,37 @@ class StandingController extends Controller
                 return $team->getPointsAttribute($selectedSeasonId);
             });
 
+        $homeTeams = Team::whereExists(function ($query) use ($selectedLeagueId, $selectedSeasonId) {
+            $query->select(DB::raw(1))
+                ->from('games')
+                ->whereRaw('(teams.id = games.team1_id)')
+                ->where('games.league_id', $selectedLeagueId)
+                ->where('games.season_id', $selectedSeasonId);
+        })
+            ->get()
+            ->sortByDesc(function ($team) use ($selectedSeasonId) {
+                return $team->getHomePointsAttribute($selectedSeasonId);
+            });
+
+        $awayTeams = Team::whereExists(function ($query) use ($selectedLeagueId, $selectedSeasonId) {
+            $query->select(DB::raw(1))
+                ->from('games')
+                ->whereRaw('(teams.id = games.team2_id)')
+                ->where('games.league_id', $selectedLeagueId)
+                ->where('games.season_id', $selectedSeasonId);
+        })
+            ->get()
+            ->sortByDesc(function ($team) use ($selectedSeasonId) {
+                return $team->getAwayPointsAttribute($selectedSeasonId);
+            });
+
         return view('test2', [
             'teams' => $teams,
+            'allGames' => $allGames,
+            'homeGames' => $homeGames,
+            'awayGames' => $awayGames,
+            'homeTeams' => $homeTeams,
+            'awayTeams' => $awayTeams,
             'seasons' => $seasons,
             'selectedSeasonId' => $selectedSeasonId,
             'leagues' => $leagues,
@@ -48,8 +89,6 @@ class StandingController extends Controller
             'selectedSeason' => $selectedSeason,
         ]);
     }
-
-
 
 
 }

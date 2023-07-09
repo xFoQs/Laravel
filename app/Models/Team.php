@@ -122,4 +122,156 @@ class Team extends Model
             'conceded' => $concededGoals,
         ];
     }
+
+    public function getHomeGamesAttribute($selectedSeasonId)
+    {
+        return $this->homeGames()
+            ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+    public function getHomeWonAttribute($selectedSeasonId)
+    {
+        return $this->homeGames()
+            ->whereNotNull('result1')
+            ->whereRaw('result1 > result2')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+    public function getHomeTiedAttribute($selectedSeasonId)
+    {
+        return $this->homeGames()
+            ->whereNotNull('result1')
+            ->whereRaw('result1 = result2')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+    public function getHomeLostAttribute($selectedSeasonId)
+    {
+        return $this->homeGames()
+            ->whereNotNull('result1')
+            ->whereRaw('result1 < result2')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+    public function getHomePointsAttribute($selectedSeasonId)
+    {
+        return $this->getHomeWonAttribute($selectedSeasonId) * 3 + $this->getHomeTiedAttribute($selectedSeasonId);
+    }
+
+    public function getTotalGamesPlayedAttribute($selectedSeasonId)
+    {
+        return $this->games()
+            ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+    public function getHomeGamesPlayedAttribute($selectedSeasonId)
+    {
+        return $this->homeGames()
+            ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+
+
+    public function getHomeGoalStats($selectedSeasonId)
+    {
+        $teamId = $this->attributes['id'];
+
+        $scoredGoals = $this->homeGames()
+            ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
+            ->sum('result1');
+
+        $concededGoals = $this->homeGames()
+            ->whereNotNull('result2')
+            ->where('season_id', $selectedSeasonId)
+            ->sum('result2');
+
+        return [
+            'scored' => $scoredGoals,
+            'conceded' => $concededGoals,
+        ];
+    }
+
+
+
+
+    public function getAwayGamesAttribute($selectedSeasonId)
+    {
+        return $this->awayGames()
+            ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+    public function getAwayWonAttribute($selectedSeasonId)
+    {
+        return $this->awayGames()
+            ->whereNotNull('result1')
+            ->whereRaw('result1 > result2')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+    public function getAwayTiedAttribute($selectedSeasonId)
+    {
+        return $this->awayGames()
+            ->whereNotNull('result1')
+            ->whereRaw('result1 = result2')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+    public function getAwayLostAttribute($selectedSeasonId)
+    {
+        return $this->awayGames()
+            ->whereNotNull('result1')
+            ->whereRaw('result1 < result2')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+    public function getAwayPointsAttribute($selectedSeasonId)
+    {
+        return $this->getAwayWonAttribute($selectedSeasonId) * 3 + $this->getAwayTiedAttribute($selectedSeasonId);
+    }
+
+
+    public function getAwayGamesPlayedAttribute($selectedSeasonId)
+    {
+        return $this->awayGames()
+            ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
+            ->count();
+    }
+
+
+    public function getAwayGoalStats($selectedSeasonId)
+    {
+        $teamId = $this->attributes['id'];
+
+        $scoredGoals = $this->awayGames()
+            ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
+            ->sum('result1');
+
+        $concededGoals = $this->awayGames()
+            ->whereNotNull('result2')
+            ->where('season_id', $selectedSeasonId)
+            ->sum('result2');
+
+        return [
+            'scored' => $scoredGoals,
+            'conceded' => $concededGoals,
+        ];
+    }
+
 }

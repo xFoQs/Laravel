@@ -173,7 +173,7 @@
                                             <tr>
                                                 <td>{{ $result['result'] }}</td>
                                                 <td>{{ $result['count'] }}</td>
-                                                <td>{{ $result['percentage'] }}%</td>
+                                                <td>{{ number_format($result['percentage'], 2) }}%</td>
                                             </tr>
                                         @endforeach
                                     @else
@@ -199,7 +199,7 @@
                                             <tr>
                                                 <td>{{ $result['result'] }}</td>
                                                 <td>{{ $result['count'] }}</td>
-                                                <td>{{ $result['percentage'] }}%</td>
+                                                <td>{{ number_format($result['percentage'], 2) }}%</td>
                                             </tr>
                                         @endforeach
                                     @else
