@@ -11,7 +11,8 @@ class Player extends Model
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
-    public function team(){
+    public function team()
+    {
         return $this->belongsTo(Team::class);
     }
 
@@ -30,6 +31,7 @@ class Player extends Model
     {
         return $this->belongsToMany(Game::class, 'game_player', 'player_id', 'game_id');
     }
+
 
     public function goals()
     {

@@ -33,7 +33,7 @@
 
                         <h3>Statystyki</h3>
                         <table class="table table-borderless">
-                            <thead class="table-primary">
+                            <thead class="table bg-primary" style="color: white;">
                             <tr>
                                 <th scope="col">Lp.</th>
                                 <th scope="col">Drużyna</th>
@@ -77,7 +77,7 @@
                         <div style="display: inline-flex"><span style="font-weight: bold">{{ $selectedLeague->name }}</span> <span style="padding-left: 5px;">sezon: {{$selectedSeason->name}}</span></div>
                         <h3>Mecze rozegrane u siebie</h3>
                         <table class="table table-borderless">
-                            <thead class="table-primary">
+                            <thead class="table bg-primary" style="color: white;">
                             <tr>
                                 <th scope="col">Lp.</th>
                                 <th scope="col">Drużyna</th>
@@ -121,7 +121,7 @@
                         <div style="display: inline-flex"><span style="font-weight: bold">{{ $selectedLeague->name }}</span> <span style="padding-left: 5px;">sezon: {{$selectedSeason->name}}</span></div>
                         <h3>Mecze rozegrane na wyjeździe</h3>
                         <table class="table table-borderless">
-                            <thead class="table-primary">
+                            <thead class="table bg-primary" style="color: white;">
                             <tr>
                                 <th scope="col">Lp.</th>
                                 <th scope="col">Drużyna</th>

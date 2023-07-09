@@ -14,10 +14,13 @@ class PlayerController extends Controller
     public function index(Request $request)
     {
         $leagues = League::all();
-        $seasons = Season::all();
+        $seasons = Season::orderBy('id', 'desc')->get();
 
         $selectedLeagueId = $request->input('league', $leagues->first()->id);
         $selectedSeasonId = $request->input('season', $seasons->max('id'));
+
+        $selectedLeague = League::find($selectedLeagueId);
+        $selectedSeason = Season::find($selectedSeasonId);
 
         $players = Player::whereHas('goals.game', function ($query) use ($selectedLeagueId, $selectedSeasonId) {
             $query->where('league_id', $selectedLeagueId)
@@ -27,7 +30,9 @@ class PlayerController extends Controller
                 $query->where('league_id', $selectedLeagueId)
                     ->where('season_id', $selectedSeasonId);
             });
-        }])->get();
+        }, 'team'])->get();
+
+
 
         // Ustawienie wartości zero dla zawodników bez wpisów
         $players->each(function ($player) {
@@ -43,7 +48,13 @@ class PlayerController extends Controller
             return $player->goals_count;
         });
 
-        return view('test3', compact('players', 'selectedLeagueId', 'selectedSeasonId', 'leagues', 'seasons'));
+        return view('test3', compact('players', 'selectedLeagueId', 'selectedSeasonId', 'leagues', 'seasons','selectedLeague','selectedSeason'));
+    }
+
+    public function countGoalsInGame($player, $gameId)
+    {
+        $goalsInGame = $player->goals->where('game_id', $gameId)->sum('count');
+        return $goalsInGame;
     }
 
 

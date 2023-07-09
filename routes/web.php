@@ -29,6 +29,7 @@ Route::get('test2', [\App\Http\Controllers\StandingController::class, 'index'])-
 Route::get('/standings', [\App\Http\Controllers\StandingController::class, 'index'])->name('standings');
 Route::get('score', [\App\Http\Controllers\StandingController::class, 'getBalance'])->name('score');
 Route::get('/player', [\App\Http\Controllers\PlayerController::class, 'index'])->name('player.filter');
+Route::get('/player/count-goals-in-game/{player}/{gameId}', [\App\Http\Controllers\PlayerController::class,'countGoalsInGame'])->name('player.count_goals_in_game');
 Route::get('test3', [\App\Http\Controllers\PlayerController::class, 'index'])->name('test3');
 Route::get('/chart', [\App\Http\Controllers\StatisticsController::class, 'chart'])->name('chart');
 Route::get('/statistics', [\App\Http\Controllers\StatisticsController::class, 'index'])->name('statistics');

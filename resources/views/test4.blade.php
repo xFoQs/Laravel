@@ -34,7 +34,7 @@
                             <h1>Czas bramek</h1>
 
                         <table class="table table-borderless">
-                            <thead class="table-primary">
+                            <thead class="table bg-primary" style="color: white;">
                             <tr>
                                 <th scope="col">Drużyna</th>
                                 <th scope="col">1-15</th>
@@ -89,7 +89,7 @@
 
 
                                     <table class="table table-borderless">
-                                        <thead class="table-primary">
+                                        <thead class="table bg-primary" style="color: white;">
                                         <tr>
                                             <th scope="col">Drużyna</th>
                                             <th scope="col">Mecze</th>
@@ -157,7 +157,7 @@
                         <div class="row" style="margin-right: 0px;">
                             <div class="col">
                                 <table class="table table-borderless">
-                                    <thead class="table-primary">
+                                    <thead class="table bg-primary" style="color: white;">
                                     <tr>
                                         <th scope="col">Wynik</th>
                                         <th scope="col">Ilość</th>
@@ -186,7 +186,7 @@
                             </div>
                             <div class="col">
                                 <table class="table table-borderless">
-                                    <thead class="table-primary">
+                                    <thead class="table bg-primary" style="color: white;">
                                     <tr>
                                         <th scope="col">Wynik</th>
                                         <th scope="col">Ilość</th>
@@ -215,7 +215,7 @@
                         <h1 class="card-header">Dodatkowe statystyki</h1>
 
                         <table class="table table-borderless">
-                            <thead class="table-primary">
+                            <thead class="table bg-primary" style="color: white;">
                             <tr>
                                 <th scope="col">Statystyka</th>
                                 <th scope="col">Ilość</th>
