@@ -50,13 +50,15 @@ class StandingController extends Controller
                 return $team->getPointsAttribute($selectedSeasonId);
             });
 
-        $homeTeams = Team::whereExists(function ($query) use ($selectedLeagueId, $selectedSeasonId) {
-            $query->select(DB::raw(1))
+        $homeTeams = Team::where(function ($query) use ($selectedLeagueId, $selectedSeasonId) {
+            $query->whereExists(function ($subQuery) use ($selectedLeagueId, $selectedSeasonId) {
+                $subQuery->select(DB::raw(1))
                 ->from('games')
                 ->whereRaw('(teams.id = games.team1_id)')
                 ->where('games.league_id', $selectedLeagueId)
                 ->where('games.season_id', $selectedSeasonId);
-        })
+        });
+                })
             ->get()
             ->sortByDesc(function ($team) use ($selectedSeasonId) {
                 return $team->getHomePointsAttribute($selectedSeasonId);

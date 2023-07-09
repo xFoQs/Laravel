@@ -165,10 +165,7 @@ class Team extends Model
 
     public function getTotalGamesPlayedAttribute($selectedSeasonId)
     {
-        return $this->games()
-            ->whereNotNull('result1')
-            ->where('season_id', $selectedSeasonId)
-            ->count();
+        return $this->getHomeGamesPlayedAttribute($selectedSeasonId) + $this->getAwayGamesPlayedAttribute($selectedSeasonId);
     }
 
     public function getHomeGamesPlayedAttribute($selectedSeasonId)
@@ -216,7 +213,7 @@ class Team extends Model
     {
         return $this->awayGames()
             ->whereNotNull('result1')
-            ->whereRaw('result1 > result2')
+            ->whereRaw('result1 < result2')
             ->where('season_id', $selectedSeasonId)
             ->count();
     }
@@ -234,7 +231,7 @@ class Team extends Model
     {
         return $this->awayGames()
             ->whereNotNull('result1')
-            ->whereRaw('result1 < result2')
+            ->whereRaw('result1 > result2')
             ->where('season_id', $selectedSeasonId)
             ->count();
     }
@@ -249,6 +246,7 @@ class Team extends Model
     {
         return $this->awayGames()
             ->whereNotNull('result1')
+            ->whereNotNull('result2')
             ->where('season_id', $selectedSeasonId)
             ->count();
     }
@@ -259,14 +257,14 @@ class Team extends Model
         $teamId = $this->attributes['id'];
 
         $scoredGoals = $this->awayGames()
-            ->whereNotNull('result1')
-            ->where('season_id', $selectedSeasonId)
-            ->sum('result1');
-
-        $concededGoals = $this->awayGames()
             ->whereNotNull('result2')
             ->where('season_id', $selectedSeasonId)
             ->sum('result2');
+
+        $concededGoals = $this->awayGames()
+            ->whereNotNull('result1')
+            ->where('season_id', $selectedSeasonId)
+            ->sum('result1');
 
         return [
             'scored' => $scoredGoals,
