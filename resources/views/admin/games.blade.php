@@ -124,8 +124,8 @@
                 <td>
                     <a class="toggle-match" data-game-id="{{ $game->id }}">
                         @if (in_array($game->id, $selectedGames))
-                            <i class="fa-solid fa-minus-circle minus-icon" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
-                            <i class="fa-solid fa-plus-circle plus-icon hidden" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
+                            <i class="fa-solid fa-minus-circle minus-icon" style="color:#4f4f4f; padding-right: 0.5rem;" title="Usuń z relacji"></i>
+                            <i class="fa-solid fa-plus-circle plus-icon hidden" style="color:#4f4f4f; padding-right: 0.5rem;" title="Dodaj do relacji"></i>
                         @else
                             <i class="fa-solid fa-minus-circle minus-icon hidden" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
                             <i class="fa-solid fa-plus-circle plus-icon" style="color:#4f4f4f; padding-right: 0.5rem;"></i>

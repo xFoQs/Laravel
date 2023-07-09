@@ -21,6 +21,9 @@ class StandingController extends Controller
         $selectedLeagueId = $request->input('league', $leagues->first()->id);
         $selectedSeasonId = $request->input('season', $seasons->max('id'));
 
+        $selectedLeague = League::find($selectedLeagueId);
+        $selectedSeason = Season::find($selectedSeasonId);
+
         $teams = Team::where(function ($query) use ($selectedLeagueId, $selectedSeasonId) {
             $query->whereExists(function ($subQuery) use ($selectedLeagueId, $selectedSeasonId) {
                 $subQuery->select(DB::raw(1))
@@ -30,7 +33,10 @@ class StandingController extends Controller
                     ->where('games.season_id', $selectedSeasonId);
             });
         })
-            ->get();
+            ->get()
+            ->sortByDesc(function ($team) use ($selectedSeasonId) {
+                return $team->getPointsAttribute($selectedSeasonId);
+            });
 
         return view('test2', [
             'teams' => $teams,
@@ -38,8 +44,12 @@ class StandingController extends Controller
             'selectedSeasonId' => $selectedSeasonId,
             'leagues' => $leagues,
             'selectedLeagueId' => $selectedLeagueId,
+            'selectedLeague' => $selectedLeague,
+            'selectedSeason' => $selectedSeason,
         ]);
     }
+
+
 
 
 }

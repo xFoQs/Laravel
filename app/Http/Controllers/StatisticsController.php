@@ -7,6 +7,7 @@ use App\Models\Season;
 use App\Models\Goals;
 use App\Models\Game;
 use App\Models\Team;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
@@ -18,6 +19,9 @@ class StatisticsController extends Controller
 
         $selectedLeagueId = $request->input('league', $leagues->first()->id);
         $selectedSeasonId = $request->input('season', $seasons->max('id'));
+
+        $selectedLeague = League::find($selectedLeagueId);
+        $selectedSeason = Season::find($selectedSeasonId);
 
         $teams = Team::where(function ($query) use ($selectedLeagueId, $selectedSeasonId) {
             $query->whereExists(function ($subQuery) use ($selectedLeagueId, $selectedSeasonId) {
@@ -98,6 +102,115 @@ class StatisticsController extends Controller
             }
         }
 
+        $statistics = [];
+        foreach ($teams as $team) {
+            $matches = $games->filter(function ($game) use ($team) {
+                return $game->team1_id == $team->id || $game->team2_id == $team->id;
+            });
+            $matchesCount = $matches->filter(function ($game) {
+                return $game->result1 !== null && $game->result2 !== null;
+            })->count();
+
+            $totalGoalsScored = 0;
+            $totalGoalsConceded = 0;
+            $matchesAbove25Goals = 0;
+            $matchesBelow25Goals = 0;
+
+            foreach ($matches as $match) {
+                if ($match->result1 !== null && $match->result2 !== null) {
+                    if ($match->team1_id == $team->id) {
+                        $totalGoalsScored += $match->result1;
+                        $totalGoalsConceded += $match->result2;
+                    } else {
+                        $totalGoalsScored += $match->result2;
+                        $totalGoalsConceded += $match->result1;
+                    }
+
+                    $totalGoals = $match->result1 + $match->result2;
+                    if ($totalGoals > 2.5) {
+                        $matchesAbove25Goals++;
+                    } elseif ($totalGoals < 2.5) {
+                        $matchesBelow25Goals++;
+                    }
+                }
+            }
+
+            $statistics[$team->id] = [
+                'M' => $matchesCount,
+                'Śr. Br' => $matchesCount > 0 ? number_format(($totalGoalsScored + $totalGoalsConceded) / $matchesCount, 2) : 0,
+                'Śr. Bz' => $matchesCount > 0 ? number_format($totalGoalsScored / $matchesCount, 2) : 0,
+                'Śr. Bs' => $matchesCount > 0 ? number_format($totalGoalsConceded / $matchesCount, 2) : 0,
+                '>2.5' => $matchesCount > 0 ? number_format(($matchesAbove25Goals / $matchesCount) * 100, 2) : 0,
+                '<2.5' => $matchesCount > 0 ? number_format(($matchesBelow25Goals / $matchesCount) * 100, 2) : 0,
+            ];
+        }
+
+        $results = Game::select('team1_id', 'team2_id', 'result1', 'result2')
+            ->where('league_id', $selectedLeagueId)
+            ->where('season_id', $selectedSeasonId)
+            ->get();
+
+        $homeWins = $results->filter(function ($game) {
+            return $game->result1 > $game->result2;
+        })->count();
+
+        $awayWins = $results->filter(function ($game) {
+            return $game->result2 > $game->result1;
+        })->count();
+
+        $draws = $results->filter(function ($game) {
+            return $game->result1 !== null && $game->result2 !== null && $game->result1 === $game->result2;
+        })->count();
+
+        $totalGames = $homeWins + $awayWins + $draws;
+
+        $homeWinsPercentage = $totalGames > 0 ? ($homeWins / $totalGames) * 100 : 0;
+        $drawsPercentage = $totalGames > 0 ? ($draws / $totalGames) * 100 : 0;
+        $awayWinsPercentage = $totalGames > 0 ? ($awayWins / $totalGames) * 100 : 0;
+
+
+// Przygotowanie danych dla wykresu kołowego
+        $chartData = new Collection([
+            ['label' => 'Zwycięstwa gospodarzy', 'value' => $homeWins, 'percentage' => $homeWinsPercentage],
+            ['label' => 'Remisy', 'value' => $draws, 'percentage' => $drawsPercentage],
+            ['label' => 'Zwycięstwa gości', 'value' => $awayWins, 'percentage' => $awayWinsPercentage],
+        ]);
+
+        $commonResults = $results->filter(function ($game) {
+            return $game->result1 !== null && $game->result2 !== null;
+        })
+            ->groupBy(function ($game) {
+                return $game->result1 . ':' . $game->result2;
+            })
+            ->map(function ($groupedGames) use ($totalGames) {
+                $count = $groupedGames->count();
+                $percentage = ($count / $totalGames) * 100;
+                return [
+                    'result' => $groupedGames->first()->result1 . ':' . $groupedGames->first()->result2,
+                    'count' => $count,
+                    'percentage' => $percentage,
+                ];
+            })
+            ->sortByDesc('count')
+            ->values();
+
+// Konwersja wyników do formatu wymaganego przez widok
+        $commonResultsLabels = $commonResults->pluck('result')->toJson();
+        $commonResultsCounts = $commonResults->pluck('count')->toJson();
+        $commonResultsPercentages = $commonResults->pluck('percentage')->toJson();
+
+// Konwersja kolekcji do formatu wymaganego przez Chart.js
+        $chartLabels = $chartData->pluck('label')->toJson();
+        $chartValues = $chartData->pluck('value')->toJson();
+        $chartPercentages = $chartData->pluck('percentage')->toJson();
+
+        // Obliczenia dodatkowe
+        $goallessMatches = $this->calculateGoallessMatches($results);
+        $winByAtLeastOneGoal = $this->calculateWinByAtLeastOneGoal($results);
+        $winByAtLeastTwoGoals = $this->calculateWinByAtLeastTwoGoals($results);
+        $winByThreeOrMoreGoals = $this->calculateWinByThreeOrMoreGoals($results);
+
+
         return view('test4', [
             'teams' => $teams,
             'goalsCount' => $goalsCount,
@@ -105,8 +218,95 @@ class StatisticsController extends Controller
             'selectedSeasonId' => $selectedSeasonId,
             'leagues' => $leagues,
             'selectedLeagueId' => $selectedLeagueId,
+            'selectedLeague' => $selectedLeague,
+            'selectedSeason' => $selectedSeason,
+            'statistics' => $statistics,
+            'chartLabels' => $chartLabels,
+            'chartData' => $chartData,
+            'chartValues' => $chartValues,
+            'chartPercentages' => $chartPercentages,
+            'commonResults' => $commonResults,
+            'commonResultsLabels' => $commonResultsLabels,
+            'commonResultsCounts' => $commonResultsCounts,
+            'commonResultsPercentages' => $commonResultsPercentages,
+            'goallessMatches' => $goallessMatches,
+            'winByAtLeastOneGoal' => $winByAtLeastOneGoal,
+            'winByAtLeastTwoGoals' => $winByAtLeastTwoGoals,
+            'winByThreeOrMoreGoals' => $winByThreeOrMoreGoals,
         ]);
     }
 
+    public function calculateGoallessMatches($results)
+    {
+        $goallessMatches = $results->filter(function ($game) {
+            return $game->result1 === 0 && $game->result2 === 0;
+        });
 
+        $goallessMatchesCount = $results->filter(function ($game) {
+            return $game->result1 === 0 && $game->result2 === 0;
+        })->count();
+
+        $goallessMatchesPercentage = $results->count() > 0 ? ($goallessMatchesCount / $results->count()) * 100 : 0;
+
+        return [
+            'count' => $goallessMatchesCount,
+            'percentage' => $goallessMatchesPercentage,
+        ];
+    }
+
+    public function calculateWinByAtLeastOneGoal($results)
+    {
+        $winByAtLeastOneGoal = $results->filter(function ($game) {
+            return ($game->result1 > $game->result2 && $game->result2 === 0) || ($game->result2 > $game->result1 && $game->result1 === 0);
+        });
+
+        $winByAtLeastOneGoalCount = $winByAtLeastOneGoal->count();
+
+        $winByAtLeastOneGoalPercentage = $results->count() > 0 ? ($winByAtLeastOneGoalCount / $results->count()) * 100 : 0;
+
+        return [
+            'count' => $winByAtLeastOneGoalCount,
+            'percentage' => $winByAtLeastOneGoalPercentage,
+        ];
+    }
+
+    public function calculateWinByAtLeastTwoGoals($results)
+    {
+        $winByAtLeastTwoGoals = $results->filter(function ($game) {
+            return ($game->result1 > $game->result2 && $game->result1 - $game->result2 >= 2) || ($game->result2 > $game->result1 && $game->result2 - $game->result1 >= 2);
+        });
+
+        $winByAtLeastTwoGoalsCount = $winByAtLeastTwoGoals->count();
+
+        $winByAtLeastTwoGoalsPercentage = $results->count() > 0 ? ($winByAtLeastTwoGoalsCount / $results->count()) * 100 : 0;
+
+        return [
+            'count' => $winByAtLeastTwoGoalsCount,
+            'percentage' => $winByAtLeastTwoGoalsPercentage,
+        ];
+    }
+
+    public function calculateWinByThreeOrMoreGoals($results)
+    {
+        $winByThreeOrMoreGoals = $results->filter(function ($game) {
+            return ($game->result1 > $game->result2 && $game->result1 - $game->result2 >= 3) || ($game->result2 > $game->result1 && $game->result2 - $game->result1 >= 3);
+        });
+
+        $winByThreeOrMoreGoalsCount = $winByThreeOrMoreGoals->count();
+
+        $winByThreeOrMoreGoalsPercentage = $results->count() > 0 ? ($winByThreeOrMoreGoalsCount / $results->count()) * 100 : 0;
+
+        return [
+            'count' => $winByThreeOrMoreGoalsCount,
+            'percentage' => $winByThreeOrMoreGoalsPercentage,
+        ];
+    }
+
+
+    public function chart(Request $request)
+    {
+
+    }
 }
+
+
