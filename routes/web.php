@@ -24,6 +24,7 @@ Route::get('/', function () {
 });
 
 Route::get('tournament', [\App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');
+Route::get('schedule', [\App\Http\Controllers\GameController::class, 'index'])->name('schedule');
 Route::get('test', [\App\Http\Controllers\GameController::class, 'index'])->name('test');
 Route::get('test2', [\App\Http\Controllers\StandingController::class, 'index'])->name('test2');
 Route::get('/standings', [\App\Http\Controllers\StandingController::class, 'index'])->name('standings');

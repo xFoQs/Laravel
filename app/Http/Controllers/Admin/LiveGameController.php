@@ -9,6 +9,7 @@ use App\Models\Season;
 use App\Models\Team;
 use App\Models\Goals;
 use App\Models\YellowCard;
+use App\Models\YellowCard2;
 use Illuminate\Support\Facades\Session;
 use App\Models\Player;
 use Illuminate\Contracts\View\View;
@@ -107,9 +108,10 @@ class LiveGameController extends Controller
                 $this->storeGoalOption3($request);
                 break;
 
-            case 'option4':
+            case 4:
                 // Zapisz dane dla opcji "2x Żółta kartka"
                 // ...
+                $this->storeYellowcard($request);
                 break;
 
             // Dodaj obsługę pozostałych opcji
@@ -217,6 +219,20 @@ class LiveGameController extends Controller
         $yellowcard->player_id = $request->input('player_id');
         $yellowcard->minute = $request->input('minute');
         $yellowcard->team_id = $request->input('team');
+        $yellowcard->league_id = $request->input('league_id');
+        $yellowcard->season_id = $request->input('season_id');
         $yellowcard->save();
+    }
+
+    private function storeYellowcard(Request $request)
+    {
+        $yellowcard2 = new YellowCard2();
+        $yellowcard2->game_id = $request->input('game_id');
+        $yellowcard2->player_id = $request->input('player_id');
+        $yellowcard2->minute = $request->input('minute');
+        $yellowcard2->team_id = $request->input('team');
+        $yellowcard2->league_id = $request->input('league_id');
+        $yellowcard2->season_id = $request->input('season_id');
+        $yellowcard2->save();
     }
 }

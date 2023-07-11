@@ -10,6 +10,7 @@ class Game extends Model
 {
     use HasFactory;
 
+
     public function team1()
     {
         return $this->belongsTo(Team::class, 'team1_id');
