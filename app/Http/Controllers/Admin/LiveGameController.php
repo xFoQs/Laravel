@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Change;
 use App\Models\Game;
+use App\Models\Information;
 use App\Models\League;
+use App\Models\MissedPenalty;
 use App\Models\Season;
+use App\Models\SuicideGoal;
 use App\Models\Team;
 use App\Models\Goals;
 use App\Models\YellowCard;
@@ -63,10 +67,21 @@ class LiveGameController extends Controller
         $goals = Goals::where('game_id', $gameId)->with('player')->get();
         // Pobierz dane z tabeli "yellowcard" na podstawie game_id
         $yellowCards = YellowCard::where('game_id', $gameId)->with('player')->get();
+        $yellowcard2 = YellowCard2::where('game_id', $gameId)->with('player')->get();
+        $missedpenalty = MissedPenalty::where('game_id', $gameId)->with('player')->get();
+        $suicidegoals = SuicideGoal::where('game_id', $gameId)->with('player')->get();
+        $message = Information::where('game_id', $gameId)->get();
+        $change = Change::where('game_id', $gameId)->with('player')->get();
+
 
         // Dodaj dane goli do $gameData
         $gameData['goals'] = $goals;
         $gameData['yellowCards'] = $yellowCards;
+        $gameData['yellowCards2'] = $yellowcard2;
+        $gameData['missedpenalty'] = $missedpenalty;
+        $gameData['suicidegoals'] = $suicidegoals;
+        $gameData['message'] = $message;
+        $gameData['change'] = $change;
 
         return response()->json($gameData);
     }
@@ -79,8 +94,6 @@ class LiveGameController extends Controller
 
         return response()->json(['players' => $players]);
     }
-
-
 
     public function setActiveGame(Request $request, $gameId)
     {
@@ -116,6 +129,28 @@ class LiveGameController extends Controller
 
             // Dodaj obsługę pozostałych opcji
 
+            case 5:
+                // Zapisz dane dla opcji "Niewykorzysany rzut karny"
+                // ...
+                $this->storeMissedPenalty($request);
+                break;
+
+            case 6:
+                // Zapisz dane dla opcji "Niewykorzysany rzut karny"
+                // ...
+                $this->storeSuicideGoals($request);
+                break;
+
+            // Dodaj obsługę pozostałych opcji
+
+            case 1:
+                $this->storeInformation($request);
+                break;
+
+            case 7:
+                $this->storeChange($request);
+                break;
+
             default:
                 // Obsługa dla przypadku, gdy żadna z opcji nie pasuje
                 break;
@@ -131,86 +166,167 @@ class LiveGameController extends Controller
 
     public function deleteGoal($goalId)
     {
-        // Sprawdź, czy bramka istnieje
         $goal = Goals::find($goalId);
-        $isGoal = true;
-
-        // Jeśli bramka nie istnieje, sprawdź, czy to żółta kartka
-        if (!$goal) {
-            $goal = YellowCard::find($goalId);
-            $isGoal = false;
-        }
 
         if ($goal) {
-            // Znajdź mecz powiązany z wydarzeniem
-            $game = Game::findOrFail($goal->game_id);
-
-            // Usuń bramkę lub żółtą kartkę
-            $goal->delete();
-
-            // Zaktualizuj wynik w tabeli games
-            $goals = Goals::where('game_id', $game->id)->get();
-            $yellowCards = YellowCard::where('game_id', $game->id)->get();
-
-            $result1 = $goals->where('team_id', $game->team1->id)->count();
-            $result2 = $goals->where('team_id', $game->team2->id)->count();
-
-            $game->result1 = $result1;
-            $game->result2 = $result2;
-            $game->save();
-
-            // Zwróć odpowiedź w formacie JSON
-            $message = $isGoal ? 'Goal deleted successfully' : 'Yellow card deleted successfully';
-            return response()->json(['message' => $message]);
+            // Usuń bramkę
+            $this->deleteRegularGoal($goal);
         } else {
-            // Bramka lub żółta kartka o podanym ID nie została znaleziona
-            return response()->json(['error' => 'Goal or yellow card not found'], 404);
-        }
-    }
+            $suicideGoal = SuicideGoal::find($goalId);
 
-    private function storeGoalOption2(Request $request)
-    {
-        // Zapisz dane dla opcji "Bramka"
-        $goal = new Goals();
-        $goal->game_id = $request->input('game_id');
-        $goal->player_id = $request->input('player_id');
-        $goal->minute = $request->input('minute');
-        $goal->team_id = $request->input('team');
-        $goal->league_id = $request->input('league_id');
-        $goal->season_id = $request->input('season_id');
-        $goal->save();
-
-        // Zlicz bramki dla team_id i game_id
-        $team1GoalsCount = Goals::where('team_id', $request->input('team'))
-            ->where('game_id', $request->input('game_id'))
-            ->count();
-
-        $team2GoalsCount = Goals::where('team_id', '!=', $request->input('team'))
-            ->where('game_id', $request->input('game_id'))
-            ->count();
-
-        // Sprawdź, czy drużyna posiada już jakiekolwiek gole w danej grze
-        if ($team1GoalsCount === 0 && $team2GoalsCount === 0) {
-            // Ustaw wartość 0 dla obu drużyn
-            $team1GoalsCount = 0;
-            $team2GoalsCount = 0;
-        } else {
-            // Drużyna ma już gole, nie zmieniaj wartości
-        }
-
-        // Aktualizuj rekord w tabeli "games" na podstawie wyników
-        $game = Game::find($request->input('game_id'));
-        if ($game) {
-            if ($request->input('team') == $game->team1_id) {
-                $game->result1 = $team1GoalsCount;
-                $game->result2 = $team2GoalsCount;
+            if ($suicideGoal) {
+                // Usuń bramkę samobójczą
+                $this->deleteSuicideGoal($suicideGoal);
             } else {
-                $game->result1 = $team2GoalsCount;
-                $game->result2 = $team1GoalsCount;
+                $yellowCard = YellowCard::find($goalId);
+
+                if ($yellowCard) {
+                    // Usuń żółtą kartkę
+                    $this->deleteYellowCard($yellowCard);
+                } else {
+                    $yellowCard2 = YellowCard2::find($goalId);
+
+                    if ($yellowCard2) {
+                        // Usuń drugą żółtą kartkę
+                        $this->deleteYellowCard2($yellowCard2);
+                    } else {
+                        $missedPenalty = MissedPenalty::find($goalId);
+
+                        if ($missedPenalty) {
+                            // Usuń niewykorzystany karny
+                            $this->deleteMissedPenalty($missedPenalty);
+                        } else {
+                            $information = Information::find($goalId);
+
+                            if ($information) {
+                                // Usuń informację
+                                $this->deleteInformation($information);
+                            } else {
+                                $change = Change::find($goalId);
+
+                                if ($change) {
+                                    // Usuń zmianę
+                                    $this->deleteChange($change);
+                                } else {
+                                    // Zdarzenie o podanym ID nie zostało znalezione
+                                    return response()->json(['error' => 'Event not found'], 404);
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            $game->save();
         }
     }
+
+    private function deleteRegularGoal($goal)
+    {
+        $game = Game::findOrFail($goal->game_id);
+        $team1Id = $game->team1_id;
+        $team2Id = $game->team2_id;
+
+        // Usuń bramkę
+        $goal->delete();
+
+        // Zaktualizuj wynik dla zwykłych bramek
+        $team1GoalsCount = Goals::where('team_id', $team1Id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        $team2GoalsCount = Goals::where('team_id', $team2Id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        // Zlicz bramki samobójcze dla obu drużyn
+        $team1SuicideGoalsCount = SuicideGoal::where('team_id', $team2Id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        $team2SuicideGoalsCount = SuicideGoal::where('team_id', $team1Id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        // Zaktualizuj wynik na podstawie liczby bramek zwykłych i samobójczych
+        $result1 = $team1GoalsCount + $team1SuicideGoalsCount;
+        $result2 = $team2GoalsCount + $team2SuicideGoalsCount;
+
+        $game->result1 = $result1;
+        $game->result2 = $result2;
+        $game->save();
+
+        // Zwróć odpowiedź w formacie JSON
+        return response()->json(['message' => 'Goal deleted successfully']);
+    }
+
+    private function deleteInformation($information)
+    {
+        // Usuń informację
+        $information->delete();
+
+        // Zwróć odpowiedź w formacie JSON
+        return response()->json(['message' => 'Information deleted successfully']);
+    }
+
+    private function deleteYellowCard2($yellowCard2)
+    {
+        // Usuń drugą żółtą kartkę
+        $yellowCard2->delete();
+    }
+
+    private function deleteChange($change)
+    {
+        // Usuń drugą żółtą kartkę
+        $change->delete();
+    }
+
+    private function deleteYellowCard($yellowCard)
+    {
+        // Usuń żółtą kartkę
+        $yellowCard->delete();
+    }
+
+
+    private function deleteMissedPenalty($missedpenalty)
+    {
+        // Usuń niewykorzystany karny
+        $missedpenalty->delete();
+    }
+
+    private function deleteSuicideGoal($goal)
+    {
+        $game = Game::findOrFail($goal->game_id);
+
+        // Usuń bramkę samobójczą
+        $goal->delete();
+
+        // Zaktualizuj wynik dla bramek samobójczych
+        $team1SuicideGoalsCount = SuicideGoal::where('team_id', $game->team1_id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        $team2SuicideGoalsCount = SuicideGoal::where('team_id', $game->team2_id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        $suicideGoalsCount = $team1SuicideGoalsCount + $team2SuicideGoalsCount;
+
+        // Zaktualizuj wynik dla zwykłych bramek
+        $team1GoalsCount = Goals::where('team_id', $game->team1_id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        $team2GoalsCount = Goals::where('team_id', $game->team2_id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        $game->result1 = $team1GoalsCount + $suicideGoalsCount;
+        $game->result2 = $team2GoalsCount + $suicideGoalsCount;
+        $game->save();
+
+        // Zwróć odpowiedź w formacie JSON
+        return response()->json(['message' => 'Suicide goal deleted successfully']);
+    }
+
 
     private function storeGoalOption3(Request $request)
     {
@@ -221,6 +337,7 @@ class LiveGameController extends Controller
         $yellowcard->team_id = $request->input('team');
         $yellowcard->league_id = $request->input('league_id');
         $yellowcard->season_id = $request->input('season_id');
+        $yellowcard->message = $request->input('message'); // Odczytaj wartość pola 'message'
         $yellowcard->save();
     }
 
@@ -233,6 +350,128 @@ class LiveGameController extends Controller
         $yellowcard2->team_id = $request->input('team');
         $yellowcard2->league_id = $request->input('league_id');
         $yellowcard2->season_id = $request->input('season_id');
+        $yellowcard2->message = $request->input('message'); // Odczytaj wartość pola 'message'
         $yellowcard2->save();
     }
+
+    private function storeMissedPenalty(Request $request)
+    {
+        $missedpenalty = new MissedPenalty();
+        $missedpenalty->game_id = $request->input('game_id');
+        $missedpenalty->player_id = $request->input('player_id');
+        $missedpenalty->minute = $request->input('minute');
+        $missedpenalty->team_id = $request->input('team');
+        $missedpenalty->league_id = $request->input('league_id');
+        $missedpenalty->season_id = $request->input('season_id');
+        $missedpenalty->message = $request->input('message'); // Odczytaj wartość pola 'message'
+        $missedpenalty->save();
+
+    }
+
+    private function updateGameResults($game)
+    {
+        // Zlicz bramki samobójcze dla obu drużyn
+        $team1SuicideGoalsCount = SuicideGoal::where('team_id', $game->team2_id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        $team2SuicideGoalsCount = SuicideGoal::where('team_id', $game->team1_id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        // Zlicz bramki dla obu drużyn
+        $team1GoalsCount = Goals::where('team_id', $game->team1_id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        $team2GoalsCount = Goals::where('team_id', $game->team2_id)
+            ->where('game_id', $game->id)
+            ->count();
+
+        // Aktualizuj wynik w tabeli "games" na podstawie bramek i bramek samobójczych
+        $game->result1 = $team1GoalsCount + $team1SuicideGoalsCount;
+        $game->result2 = $team2GoalsCount + $team2SuicideGoalsCount;
+        $game->save();
+    }
+
+    public function storeSuicideGoals(Request $request)
+    {
+        $suicidegoals = new SuicideGoal();
+        $suicidegoals->game_id = $request->input('game_id');
+        $suicidegoals->player_id = $request->input('player_id');
+        $suicidegoals->minute = $request->input('minute');
+        $suicidegoals->team_id = $request->input('team');
+        $suicidegoals->league_id = $request->input('league_id');
+        $suicidegoals->season_id = $request->input('season_id');
+        $suicidegoals->message = $request->input('message'); // Odczytaj wartość pola 'message'
+        $suicidegoals->save();
+
+        // Znajdź mecz powiązany z bramką samobójczą
+        $game = Game::find($suicidegoals->game_id);
+
+        if ($game) {
+            $this->updateGameResults($game);
+        }
+    }
+
+    public function storeGoalOption2(Request $request)
+    {
+        $goal = new Goals();
+        $goal->game_id = $request->input('game_id');
+        $goal->player_id = $request->input('player_id');
+        $goal->minute = $request->input('minute');
+        $goal->team_id = $request->input('team');
+        $goal->league_id = $request->input('league_id');
+        $goal->season_id = $request->input('season_id');
+        $goal->message = $request->input('message'); // Odczytaj wartość pola 'message'
+        $goal->save();
+
+        // Znajdź mecz powiązany z bramką
+        $game = Game::find($request->input('game_id'));
+
+
+        if ($game) {
+            $this->updateGameResults($game);
+        }
+    }
+
+
+    public function storeChange(Request $request)
+    {
+        $change = new Change();
+        $change->game_id = $request->input('game_id');
+        $change->player_id = $request->input('player_id');
+        $change->minute = $request->input('minute');
+        $change->team_id = $request->input('team');
+        $change->league_id = $request->input('league_id');
+        $change->season_id = $request->input('season_id');
+        $change->message = $request->input('message'); // Odczytaj wartość pola 'message'
+        $change->save();
+
+        // Znajdź mecz powiązany z bramką
+        $game = Game::find($change->game_id);
+
+        if ($game) {
+            $this->updateGameResults($game);
+        }
+    }
+
+
+    public function storeInformation(Request $request)
+    {
+        $information = new Information();
+        $information->game_id = $request->input('game_id');
+        $information->league_id = $request->input('league_id');
+        $information->season_id = $request->input('season_id');
+        $information->message = $request->input('message'); // Odczytaj wartość pola 'message'
+        $information->save();
+
+        // Znajdź mecz powiązany z bramką
+        $game = Game::find($information->game_id);
+
+        if ($game) {
+            $this->updateGameResults($game);
+        }
+    }
+
 }

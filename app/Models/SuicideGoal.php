@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class YellowCard2 extends Model
+class SuicideGoal extends Model
 {
-    protected $table = 'redcard';
+    protected $table = 'suicidegoals';
 
     protected $fillable = [
         'game_id',

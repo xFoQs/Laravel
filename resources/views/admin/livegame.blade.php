@@ -116,7 +116,7 @@
 
         .time-input {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
         }
 
         .select2-selection__rendered {
@@ -211,7 +211,7 @@
                         <td>
                             <label class="btn btn-secondary">
                                 <input type="radio" name="options" value="4">
-                                <span>2x Żółta kartka</span>
+                                <span>Czerwona kartka</span>
                             </label>
                         </td>
                         <td>
@@ -240,10 +240,10 @@
                 <div id="team_action" style="padding-top: 1rem; display: none;">
                     <div class="input-group">
                         <label class="form-check-label" style="display: block; margin-bottom: 0.5rem;">
-                            <input type="radio" class="form-check-input time-input" name="team" value="" required>
+                            <input type="radio" class="form-check-input time-input" name="team" value="">
                         </label>
                         <label class="form-check-label" style="display: block;">
-                            <input type="radio" class="form-check-input time-input" name="team" value="" required>
+                            <input type="radio" class="form-check-input time-input" name="team" value="">
                         </label>
                     </div>
                 </div>
@@ -256,6 +256,11 @@
                     <select id="player_select" class="form-control" name="player_id">
                         <option></option>
                     </select>
+                </div>
+
+                <div class="form-outline">
+                    <textarea class="form-control" id="message" rows="2" name="message" style="margin-bottom: 1rem;"></textarea>
+                    <label class="form-label" for="textAreaExample">Wiadomość</label>
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Wyślij</button>
@@ -355,31 +360,86 @@
                     var previewSection = $('#preview-section');
                     var previewContent = '';
 
-                    var allEvents = response.goals.concat(response.yellowCards); // Połącz bramki i żółte kartki w jedną tablicę
+                    var allEvents = response.goals.concat(response.yellowCards, response.yellowCards2, response.missedpenalty, response.suicidegoals, response.change); // Połącz bramki, żółte kartki, 2x żółte kartki, niewykorzystane karny i samobójcze gole w jedną tablicę
 
                     allEvents.sort(function(a, b) {
-                        return b.minute - a.minute; // Sortuj według minuty malejąco
+                        if (a.minute === b.minute) {
+                            if (a.team_id === b.team_id) {
+                                return b.eventId - a.eventId; // Sortuj według ID zdarzeń malejąco
+                            } else {
+                                return a.team_id - b.team_id; // Sortuj według ID drużyn rosnąco
+                            }
+                        } else {
+                            return b.minute - a.minute; // Sortuj według minuty malejąco
+                        }
                     });
 
                     allEvents.forEach(function(event) {
                         var teamName = event.team_id === response.team1Id ? response.team1Name : response.team2Name;
-                        var eventType = response.goals.includes(event) ? 'Bramka' : 'Żółta kartka';
+                        var eventType = '';
+
+                        if (response.goals.includes(event)) {
+                            eventType = 'Bramka';
+                        } else if (response.yellowCards.includes(event)) {
+                            eventType = 'Żółta kartka';
+                        } else if (response.yellowCards2.includes(event)) {
+                            eventType = 'Czerwona kartka';
+                        } else if (response.missedpenalty.includes(event)) {
+                            eventType = 'Niewykorzystany karny';
+                        } else if (response.suicidegoals.includes(event)) {
+                            eventType = 'Samobójczy gol';
+                        } else if (response.change.includes(event)){
+                            eventType = "Zmiana";
+                        }
+
                         var playerName = event.player && event.player.name ? event.player.name : 'Nieznany';
                         var playerSurname = event.player && event.player.surname ? event.player.surname : 'Zawodnik';
                         var minute = event.minute !== null ? event.minute : '';
                         var eventId = event.id;
 
-                        var eventBadgeClass = response.goals.includes(event) ? 'badge-primary' : 'badge-warning';
+                        var eventBadgeClass = response.goals.includes(event)
+                            ? 'badge-primary'
+                            : response.yellowCards.includes(event) || response.yellowCards2.includes(event)
+                                ? 'badge-warning'
+                                : response.missedpenalty.includes(event)
+                                    ? 'badge-danger'
+                                    : response.suicidegoals.includes(event) || response.change.includes(event)
+                                        ? 'badge-dark'
+                                        : '';
+
+                        if (eventType === 'Czerwona kartka') {
+                            eventBadgeClass = 'badge-danger'; // Ustaw czerwony badge dla Czerwonej kartki
+                        }
+
+
+                        previewContent += `
+    <div class="preview" style="padding: 4px; display: flex; justify-content: space-between;">
+        <div style="padding-right:4rem;">
+            <span style="font-size: 16px; font-weight: bold">${minute}'</span>
+            <span class="badge ${eventBadgeClass}" style="font-size: 14px;">${eventType}</span> w drużynie
+            <span class="badge badge-secondary" style="font-size: 14px;">${teamName}</span> dla
+            <span class="badge ${eventBadgeClass}" style="font-size: 14px;">${playerName} ${playerSurname}</span>
+        </div>
+        <button class="btn btn-danger btn-sm" data-event-id="${eventId}" onclick="deleteEvent(this)">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </div>
+`;
+
+                    });
+
+// Dodaj informacje z $message do sekcji podglądu
+                    response.message.forEach(function(info) {
+                        var messageContent = info.message;
+                        var messageId = info.id;
 
                         previewContent += `
         <div class="preview" style="padding: 4px; display: flex; justify-content: space-between;">
             <div style="padding-right:4rem;">
-                <span style="font-size: 16px; font-weight: bold">${minute}'</span>
-                <span class="badge ${eventBadgeClass}" style="font-size: 14px;">${eventType}</span> w drużynie
-                <span class="badge badge-secondary" style="font-size: 14px;">${teamName}</span> dla
-                <span class="badge ${eventBadgeClass}" style="font-size: 14px;">${playerName} ${playerSurname}</span>
+                <span class="badge badge-info" style="font-size: 14px;">Wiadomość</span>
+                <span style="font-size: 14px;">${messageContent}</span>
             </div>
-            <button class="btn btn-danger btn-sm" data-event-id="${eventId}" onclick="deleteEvent(this)">
+            <button class="btn btn-danger btn-sm" data-event-id="${messageId}" onclick="deleteEvent(this)">
                 <i class="fas fa-trash-alt"></i>
             </button>
         </div>
@@ -388,6 +448,7 @@
 
                     previewSection.html(previewContent);
                     previewSection.show();
+
 
                     var gameSelect = $('#team_action');
                     gameSelect.html(`
@@ -431,7 +492,7 @@
                             dataType: 'json',
                             success: function(response) {
                                 var playerSelect = $('#player_select');
-                                playerSelect.empty(); // Wyczyść Select2 przed dodaniem nowych opcji
+                                playerSelect.empty(); // Wyczyść Select2 przed dodaniem nowych
 
                                 // Dodaj opcję "Wybierz zawodnika" jako domyślną opcję wybraną
                                 var defaultOption = new Option('Wybierz zawodnika', '');
@@ -536,6 +597,7 @@
                     if (response.ok) {
                         var minuteInput = document.getElementById('minute_input');
                         minuteInput.value = '';
+                        $('#message').val('');
                         updateGameData(activeGameId);
 
                     } else {
@@ -549,15 +611,15 @@
                 });
         });
 
-
         function deleteGoal(button) {
             var goalId = button.getAttribute('data-event-id');
 
             // Wykonaj żądanie AJAX do usunięcia bramki
             $.ajax({
-                url: '/delete-goal/' + goalId,  // Zmień ścieżkę URL na odpowiednią dla twojej aplikacji
-                type: 'GET',  // Lub użyj metody 'DELETE', jeśli serwer obsługuje taką metodę
+                url: '/delete-goal/' + goalId,
+                type: 'GET',
                 success: function(response) {
+                    // Aktualizuj dane gry
                     updateGameData(activeGameId);
 
                     // Sprawdź, czy goalId istnieje w gameData.goals lub gameData.yellowCards
@@ -573,11 +635,23 @@
                         var goal = gameData.goals[goalIndex];
                         gameData.goals.splice(goalIndex, 1);
 
-                        // Zaktualizuj wynik w zależności od drużyny, której dotyczyła bramka
-                        if (goal.team_id === gameData.team1Id) {
-                            gameData.result1--;
+                        // Sprawdź, czy usunięta bramka była bramką samobójczą
+                        var isSuicideGoal = goal.is_suicide_goal === 1;
+
+                        // Zaktualizuj wynik w zależności od rodzaju bramki
+                        if (isSuicideGoal) {
+                            if (goal.team_id === gameData.team1Id) {
+                                gameData.result1--;
+                            } else {
+                                gameData.result2--;
+                            }
                         } else {
-                            gameData.result2--;
+                            if (goal.team_id === gameData.team1Id) {
+                                gameData.result1--;
+                            } else {
+                                gameData.result2--;
+                            }
+                            // Tutaj możesz wykonać dodatkowe operacje po usunięciu zwykłej bramki
                         }
                     } else if (yellowCardIndex !== -1) {
                         // Usuń żółtą kartkę z gameData.yellowCards
@@ -595,6 +669,7 @@
                 }
             });
         }
+
         $(document).on('click', '.btn-danger', function() {
             deleteGoal(this);
         });
@@ -624,10 +699,22 @@
         $('.btn-group-table input[type="radio"]').change(function() {
             var selectedOption = $('.btn-group-table input[type="radio"]:checked').val();
 
-            if (selectedOption === '2' || selectedOption === '3' || selectedOption === '4' || selectedOption === '5' || selectedOption === '6') {
+            if (selectedOption === '2' || selectedOption === '3' || selectedOption === '4' || selectedOption === '5' || selectedOption === '6' || selectedOption === '7') {
                 $('#team_action').show();
+                $('input[name="team"]').prop('required', true);
             } else {
                 $('#team_action').hide();
+                $('input[name="team"]').prop('required', false);
+            }
+        });
+
+        $('.btn-group-table input[type="radio"]').change(function() {
+            var selectedOption = $('.btn-group-table input[type="radio"]:checked').val();
+
+            if (selectedOption === '1') {
+                $('#minute_input, #player_select').prop('disabled', true); // Wyłącz input i select
+            } else {
+                $('#minute_input, #player_select').prop('disabled', false); // Włącz input i select
             }
         });
 

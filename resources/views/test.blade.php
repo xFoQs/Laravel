@@ -93,10 +93,10 @@
                                     <td style="width: 32%; text-align: right; padding: 4px;">{{ $game->team1->name }}</td>
                                     <td style="width: 6%; text-align: center; padding: 4px;">
                                         <span style="color: #3b71ca;">
-                                            {{ $game->result1 !== null ? $game->result1 : '?' }}
-                                            :
-                                            {{ $game->result2 !== null ? $game->result2 : '?' }}
-                                        </span>
+               {{ $game->result1 !== null  ? $game->result1 : '?' }}
+                :
+                {{ $game->result2 !== null  ? $game->result2 : '?' }}
+            </span>
                                     </td>
                                     <td style="width: 32%; text-align: left; padding: 4px;">{{ $game->team2->name }}</td>
                                     <td class="text-end" style="width: 10%; text-align: right; padding: 4px;">{{ \Carbon\Carbon::parse($game->start_time)->format('H:i') }}</td>
