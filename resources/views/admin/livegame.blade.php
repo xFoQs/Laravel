@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
@@ -67,6 +68,12 @@
             box-shadow: 0 0 2px 0 rgba(48, 48, 48, 0.1), 0 4px 4px 0 rgba(48, 48, 48, 0.1);
         }
 
+        .btn-group-table2 td {
+            padding: 1px;
+            margin: 0;
+            box-shadow: 0 0 2px 0 rgba(48, 48, 48, 0.1), 0 4px 4px 0 rgba(48, 48, 48, 0.1);
+        }
+
         .btn-group{
             box-shadow: 0 0 2px 0 rgba(48, 48, 48, 0.1), 0 4px 4px 0 rgba(48, 48, 48, 0.1);
             padding: 1px;
@@ -80,7 +87,19 @@
             display: none;
         }
 
+        .btn-group-table2 input[type="radio"] {
+            display: none;
+        }
+
         .btn-group-table label.btn-secondary {
+            background-color: white;
+            color: #4f4f4f;
+            width: 100%;
+            padding: 12px 10px;
+            text-align: center;
+        }
+
+        .btn-group-table2 label.btn-secondary {
             background-color: white;
             color: #4f4f4f;
             width: 100%;
@@ -114,6 +133,11 @@
             color: white;
         }
 
+        .btn-group-table2 label.btn-secondary.active {
+            background-color: #386bc0 !important;
+            color: white;
+        }
+
         .time-input {
             width: 100%;
             padding: 8px;
@@ -127,6 +151,11 @@
         }
         .select2-selection__arrow {
             height: 43px !important;
+        }
+
+        .status-button.active {
+            background-color: #386bc0 !important;
+            color: white !important;
         }
 
 
@@ -166,7 +195,10 @@
         @foreach ($games as $key => $game)
             <div class="col-12 col-md-4">
                 <div class="panel" data-game-id="{{ $game->id }}">
-                    <div style="width: 70%;"><span style="font-size: 14px;">{{ $game->team1->name }} -- {{ $game->team2->name }}</span></div>
+                    <div style="width: 70%;"><span style="font-size: 14px;">
+        {{ $game->team1->name }} : {{ $game->team2->name }}
+        <span class="badge badge-primary">{{ $game->status }}</span>
+    </span></div>
                     <div><a class="toggle-match" data-game-id="{{ $game->id }}">
                             <span class="tak" style="font-size: 14px;">Usuń</span>
                         </a></div>
@@ -345,7 +377,7 @@
                                             <span class="match-score-divider">:</span>
                                             <span class="match-score-number">${response.result2 !== null ? response.result2 : '0'}</span>
                                         </div>
-                                        <div class="match-status">Ended</div>
+                                        <div class="match-status">${response.status}</div>
                                     </div>
                                 </div>
                                 <div class="column">
@@ -358,10 +390,113 @@
                                 </div>
                             </div>
 
+<div class="text-center" style="padding-bottom: 1rem;" id="match-status-panel">
+    <table class="btn-group btn-group-table2" data-toggle="buttons">
+        <tr>
+            <td>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="match-status" value="Przed meczem">
+                    <span>Przed meczem</span>
+                </label>
+            </td>
+            <td>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="match-status" value="Pierwsza połowa">
+                    <span>Pierwsza połowa</span>
+                </label>
+            </td>
+            <td>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="match-status" value="Przerwa">
+                    <span>Przerwa</span>
+                </label>
+            </td>
+            <td>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="match-status" value="Druga połowa">
+                    <span>Druga połowa</span>
+                </label>
+            </td>
+            <td>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="match-status" value="Dogrywka">
+                    <span>Dogrywka</span>
+                </label>
+            </td>
+            <td>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="match-status" value="Karne">
+                    <span>Karne</span>
+                </label>
+            </td>
+            <td>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="match-status" value="Koniec">
+                    <span>Koniec</span>
+                </label>
+            </td>
+        </tr>
+    </table>
+</div>
+
 
                         </div>
                     </div>
                 `);
+
+                    // Ustaw wartość początkową dla zmiennej gameStatus na wartość pobraną z serwera
+                    var gameStatus = response.status;
+
+                    const matchStatusLabels = document.querySelectorAll('#match-status-panel label.btn-secondary');
+
+                    matchStatusLabels.forEach((label) => {
+                        const statusValue = label.querySelector('input').value;
+
+                        // Porównaj statusValue z gameStatus i ustaw klasę "active" dla odpowiedniego przycisku
+                        if (statusValue === gameStatus) {
+                            label.classList.add('active');
+                        }
+
+                        label.addEventListener('click', () => {
+                            // Usuń klasę 'active' z pozostałych przycisków
+                            matchStatusLabels.forEach((otherLabel) => {
+                                otherLabel.classList.remove('active');
+                            });
+
+                            // Dodaj klasę 'active' do aktualnie klikniętego przycisku
+                            label.classList.add('active');
+
+                            // Pobierz wartość przycisku (status gry)
+                            const statusValue = label.querySelector('input').value;
+
+                            // Wywołaj funkcję do aktualizacji statusu gry na serwerze
+                            updateGameStatus(activeGameId, statusValue);
+                        });
+                    });
+
+                    function updateGameStatus(gameId, status) {
+                        // Ustaw nagłówek X-CSRF-TOKEN przed wysłaniem żądania AJAX
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+
+                        // Wyślij żądanie AJAX do serwera
+                        $.ajax({
+                            url: '/admin/games/' + gameId + '/status', // Endpoint do aktualizacji statusu gry
+                            method: 'POST',
+                            data: { status: status },
+                            success: function(response) {
+                                // Aktualizuj status gry na interfejsie użytkownika
+                                console.log('Status gry zaktualizowany!');
+                                updateGameData(activeGameId);
+                            },
+                            error: function(error) {
+                                console.error('Wystąpił błąd podczas aktualizacji statusu gry:', error);
+                            }
+                        });
+                    }
 
                     var previewSection = $('#preview-section');
                     var previewContent = '';
@@ -695,6 +830,21 @@
         });
     });
 
+</script>
+
+
+<script>
+    const buttons = document.querySelectorAll('.status-button');
+
+    buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+            buttons.forEach((otherButton) => {
+                otherButton.classList.remove('active');
+            });
+
+            button.classList.add('active');
+        });
+    });
 </script>
 
 

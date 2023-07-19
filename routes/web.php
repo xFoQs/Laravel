@@ -75,6 +75,7 @@ Route::get('/update', [PlayerController::class, 'edit'])->name('player.update');
 
     Route::get('/livegame',[\App\Http\Controllers\Admin\LiveGameController::class, 'index']);
     Route::post('/select-game', [LiveGameController::class, 'selectGame'])->name('select.game');
+    Route::post('/admin/games/{gameId}/status', [\App\Http\Controllers\Admin\LiveGameController::class, 'updateGameStatus']);
     Route::get('/admin/livegame/{gameId}', [App\Http\Controllers\Admin\LiveGameController::class, 'updateGameData'])->name('admin.livegame.updateGameData');
 
     Route::get('/players/{teamId}/{seasonId}', [App\Http\Controllers\Admin\LiveGameController::class, 'getPlayersByTeamAndSeason']);

@@ -40,6 +40,23 @@ class LiveGameController extends Controller
         return view('admin.livegame', compact('games', 'teams', 'leagues', 'seasons', 'selectedGames'));
     }
 
+
+    public function updateGameStatus(Request $request, $gameId)
+    {
+        // Pobierz zaktualizowany status gry z żądania
+        $status = $request->input('status');
+
+        // Znajdź grę w bazie danych na podstawie $gameId
+        $game = Game::findOrFail($gameId);
+
+        // Zaktualizuj status gry
+        $game->status = $status;
+        $game->save();
+
+        // Zwróć odpowiedź z potwierdzeniem
+        return response()->json(['message' => 'Status gry został zaktualizowany'], 200);
+    }
+
     public function updateGameData(Request $request, $gameId)
     {
         // Pobierz dane meczu z bazy danych na podstawie $gameId
@@ -60,6 +77,7 @@ class LiveGameController extends Controller
             'team2Logo' => $team2Logo, // Dodaj logo drużyny 2
             'team2Id' => $game->team2->id,
             'round' => $game->round,
+            'status' => $game->status,
             'league' => $game->league->name,
             'leagueID' => $game->league->id,
             'seasonID' => $game->season->id,
