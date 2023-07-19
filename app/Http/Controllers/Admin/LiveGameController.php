@@ -45,6 +45,10 @@ class LiveGameController extends Controller
         // Pobierz dane meczu z bazy danych na podstawie $gameId
         $game = Game::findOrFail($gameId);
 
+        // Pobierz zdjęcia drużyn
+        $team1Logo = $game->team1->photo;
+        $team2Logo = $game->team2->photo;
+
         // Przygotuj dane meczu do przesłania do widoku
         $gameData = [
             'team1Name' => $game->team1->name,
@@ -52,6 +56,8 @@ class LiveGameController extends Controller
             'result1' => $game->result1,
             'result2' => $game->result2,
             'team2Name' => $game->team2->name,
+            'team1Logo' => $team1Logo, // Dodaj logo drużyny 1
+            'team2Logo' => $team2Logo, // Dodaj logo drużyny 2
             'team2Id' => $game->team2->id,
             'round' => $game->round,
             'league' => $game->league->name,

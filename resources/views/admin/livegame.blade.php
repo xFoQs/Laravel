@@ -110,7 +110,7 @@
         }
 
         .btn-group-table label.btn-secondary.active {
-            background-color: blue;
+            background-color: #386bc0 !important;
             color: white;
         }
 
@@ -126,7 +126,7 @@
             height: 45px !important;
         }
         .select2-selection__arrow {
-            height: 45px !important;
+            height: 43px !important;
         }
 
 
@@ -270,7 +270,6 @@
         </div>
 
     <div id="preview-section" style="display: none; align-content: center;">
-        <h1>Podgląd</h1>
 
     </div>
 
@@ -333,6 +332,9 @@
                             <div class="match-content">
                                 <div class="column">
                                     <div class="team">
+                                            <div class="team-logo">
+                                            <img src="/img/${response.team1Logo}" alt="Team 2 Logo" style="width: 90px; height: 100px;">
+                                        </div>
                                         <h2 class="team-name">${response.team1Name}</h2>
                                     </div>
                                 </div>
@@ -343,16 +345,20 @@
                                             <span class="match-score-divider">:</span>
                                             <span class="match-score-number">${response.result2 !== null ? response.result2 : '0'}</span>
                                         </div>
+                                        <div class="match-status">Ended</div>
                                     </div>
                                 </div>
                                 <div class="column">
                                     <div class="team">
                                         <div class="team-logo">
-                                            <h2 class="team-name">${response.team2Name}</h2>
+                                            <img src="/img/${response.team2Logo}" alt="Team 2 Logo" style="width: 80px; height: 90px;">
                                         </div>
+                                         <h2 class="team-name">${response.team2Name}</h2>
                                     </div>
                                 </div>
                             </div>
+
+
                         </div>
                     </div>
                 `);
