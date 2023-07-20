@@ -57,7 +57,7 @@
             margin-right: 5px;
         }
 
-        .panel.active .toggle-match .tak {
+        .panel.active .toggle-match i.fas.fa-trash-alt {
             color: #fff;
         }
 
@@ -159,6 +159,7 @@
         }
 
 
+
     </style>
 
 </head>
@@ -199,9 +200,12 @@
         {{ $game->team1->name }} : {{ $game->team2->name }}
         <span class="badge badge-primary">{{ $game->status }}</span>
     </span></div>
-                    <div><a class="toggle-match" data-game-id="{{ $game->id }}">
-                            <span class="tak" style="font-size: 14px;">Usuń</span>
-                        </a></div>
+                    <div>
+                        <a class="toggle-match" data-game-id="{{ $game->id }}">
+                            <span class="tak" style="font-size: 14px;"></span>
+                            <i class="fas fa-trash-alt"></i> <!-- Ikona usuwania -->
+                        </a>
+                    </div>
                 </div>
             </div>
         @endforeach
@@ -365,8 +369,8 @@
                                 <div class="column">
                                     <div class="team">
                                             <div class="team-logo">
-                                            <img src="/img/${response.team1Logo}" alt="Team 2 Logo" style="width: 90px; height: 100px;">
-                                        </div>
+    <img src="/img/${response.team1Logo !== null ? response.team1Logo : 'brak.webp'}" alt="Team 2 Logo" style="width: 90px; height: 100px;">
+</div>
                                         <h2 class="team-name">${response.team1Name}</h2>
                                     </div>
                                 </div>
@@ -383,8 +387,8 @@
                                 <div class="column">
                                     <div class="team">
                                         <div class="team-logo">
-                                            <img src="/img/${response.team2Logo}" alt="Team 2 Logo" style="width: 80px; height: 90px;">
-                                        </div>
+    <img src="/img/${response.team2Logo !== null ? response.team2Logo : 'brak.webp'}" alt="Team 2 Logo" style="width: 80px; height: 90px;">
+</div>
                                          <h2 class="team-name">${response.team2Name}</h2>
                                     </div>
                                 </div>
@@ -395,7 +399,7 @@
         <tr>
             <td>
                 <label class="btn btn-secondary">
-                    <input type="radio" name="match-status" value="Przed meczem">
+                    <input type="radio" name="match-status" value="Nierozegrany">
                     <span>Przed meczem</span>
                 </label>
             </td>
@@ -475,20 +479,17 @@
                     });
 
                     function updateGameStatus(gameId, status) {
-                        // Ustaw nagłówek X-CSRF-TOKEN przed wysłaniem żądania AJAX
                         $.ajaxSetup({
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             }
                         });
 
-                        // Wyślij żądanie AJAX do serwera
                         $.ajax({
-                            url: '/admin/games/' + gameId + '/status', // Endpoint do aktualizacji statusu gry
+                            url: '/admin/games/' + gameId + '/status',
                             method: 'POST',
                             data: { status: status },
                             success: function(response) {
-                                // Aktualizuj status gry na interfejsie użytkownika
                                 console.log('Status gry zaktualizowany!');
                                 updateGameData(activeGameId);
                             },
@@ -608,7 +609,6 @@
                     var selectedTeamRadio = $('input[name="team"]:checked');
                     if (selectedTeamRadio.length === 0) {
                         var playerSelect = $('#player_select');
-                        console.log("kurwo");
                         playerSelect.empty(); // Wyczyść Select2 przed dodaniem nowych opcji
                     }
                     // Jeśli wybrany jest klub, załaduj zawodników z wybranego klubu do Select2

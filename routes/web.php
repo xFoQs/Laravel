@@ -35,6 +35,8 @@ Route::get('test3', [\App\Http\Controllers\PlayerController::class, 'index'])->n
 Route::get('/chart', [\App\Http\Controllers\StatisticsController::class, 'chart'])->name('chart');
 Route::get('/statistics', [\App\Http\Controllers\StatisticsController::class, 'index'])->name('statistics');
 Route::get('test4', [\App\Http\Controllers\StatisticsController::class, 'index'])->name('test4');
+Route::get('/game_data', [\App\Http\Controllers\GameData::class, 'index'])->name('gameData.index');
+Route::get('/gamedata/{gameId}', [\App\Http\Controllers\GameData::class, 'updateGameData']);
 
 
 
