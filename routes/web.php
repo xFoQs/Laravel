@@ -19,10 +19,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('auth.login');
+Route::get('/page', function () {
+    return view('page');
 });
 
+Route::get('/', [\App\Http\Controllers\IndexController::class, 'index'])->name('page');
 Route::get('tournament', [\App\Http\Controllers\TournamentController::class, 'index'])->name('tournament');
 Route::get('schedule', [\App\Http\Controllers\GameController::class, 'index'])->name('schedule');
 Route::get('test', [\App\Http\Controllers\GameController::class, 'index'])->name('test');

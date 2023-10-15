@@ -25,10 +25,15 @@
     />
 
     <title>Games</title>
+
 </head>
+
 <body>
 <div class="container">
     <ul style="column-gap: 5rem;" class="bg-primary navbar-nav d-flex justify-content-center flex-row align-items-center">
+        <li class="nav-item">
+            <a class="nav-link text-white" href="{{ route('page') }}">Strona główna</a>
+        </li>
         <li class="nav-item">
             <a class="nav-link text-white" href="{{ route('test') }}">Mecze</a>
         </li>

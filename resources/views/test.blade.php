@@ -89,17 +89,33 @@
                             <table class="table table-borderless">
                                 <tbody>
                                 <tr>
-                                    <td class="text-start" style="width: 12%; text-align: left; padding: 4px;">{{ $game->status }}</td>
+                                                                        <td class="text-start" style="width: 4%; text-align: left; padding: 4px;">
+                                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ $game->status }}">
+                                            @if ($game->status == 'Nierozegrany')
+                                                <i class="fa-solid fa-user-clock"></i>
+                                            @elseif ($game->status == 'Koniec')
+                                                <i class="fa-solid fa-calendar-check"></i>
+                                            @else
+                                                {{ $game->status }}
+                                            @endif
+                                        </span>
+                                    </td>
                                     <td style="width: 32%; text-align: right; padding: 4px;">{{ $game->team1->name }}</td>
                                     <td style="width: 6%; text-align: center; padding: 4px;">
-                                        <a href="game_data?game_id={{ $game->id }}" target="_blank" style="color: #3b71ca;">
-                                            {{ $game->result1 !== null ? $game->result1 : '?' }}
+                                        <a href="game_data?game_id={{ $game->id }}" target="_blank" style="color: #0043de;">
+                                            <strong>{{ $game->result1 !== null ? $game->result1 : '?' }}</strong>
                                             :
-                                            {{ $game->result2 !== null ? $game->result2 : '?' }}
+                                            <strong>{{ $game->result2 !== null ? $game->result2 : '?' }}</strong>
                                         </a>
                                     </td>
                                     <td style="width: 32%; text-align: left; padding: 4px;">{{ $game->team2->name }}</td>
-                                    <td class="text-end" style="width: 10%; text-align: right; padding: 4px;">{{ \Carbon\Carbon::parse($game->start_time)->format('H:i') }}</td>
+                                    <td class="text-end" style="width: 22%; text-align: right; padding: 4px; font-size: 13px;">
+                                        @php
+                                            $startDateTime = \Carbon\Carbon::parse($game->start_time);
+                                            $formattedDate = $startDateTime->day . ' ' . $polishMonths[$startDateTime->month] . ' ' . $startDateTime->year . ', <strong>' . $startDateTime->format('H:i') . '</strong>';
+                                        @endphp
+                                        {!! $formattedDate !!}
+                                    </td>
                                 </tr>
                                 </tbody>
                             </table>

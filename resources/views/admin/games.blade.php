@@ -112,7 +112,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $game->team1->name }} - {{ $game->team2->name }}</td>
                 <td>{{ $game->league->name }}</td>
-                <td>{{ $game->round }}</td>
+                <td>{{ explode('-', $game->round)[0] }}</td>
                 <td>{{ $localizedDate->isoFormat('D MMMM YYYY') }}</td>
                 <td>{{ $localizedTime }}</td>
                 <td>{{ $game->season->name ?? 'Brak sezonu' }}</td>

@@ -78,7 +78,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 5px 0;
+            padding: 10px 0;
         }
 
         .timeline__item-event {
@@ -89,14 +89,20 @@
         .timeline__item-time {
             flex-basis: 40px;
             text-align: center;
+            border-radius: 20%;
+            background-color: #fbfbfb;
+            box-shadow: 0 0 2px 0 rgba(48, 48, 48, 0.1), 0 4px 4px 0 rgba(48, 48, 48, 0.1);
+            z-index: 100;
         }
 
         .timeline__item-event--home {
             text-align: right;
+            padding: 0 20px;
         }
 
         .timeline__item-event--away {
             text-align: left;
+            padding: 0 20px;
         }
 
     </style>
@@ -119,6 +125,8 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+
+    $(document).ready(function() {
     // Funkcja, która pobierze i wyświetli dane dla określonego game_id za pomocą AJAX
     function updateGameData(gameId) {
         // Pobierz dane meczu z serwera za pomocą AJAX
@@ -184,6 +192,7 @@
                     response.change
                 );
 
+
                 function generateTimeline(response, goals, yellowCards, yellowCards2, missedPenalties, suicideGoals, changes) {
                     var events = goals.concat(yellowCards, yellowCards2, missedPenalties, suicideGoals, changes);
 
@@ -220,6 +229,7 @@
                         var awayEvent = $('<div class="timeline__item-event timeline__item-event--away"></div>');
                         var eventTime = $('<div class="timeline__item-time"></div>');
 
+
                         if (eventType === 'Zmiana') {
                             listItem.addClass('timeline__item--replace');
                             homeEvent.append(`<div>${event.player1.name} <i class="fa fa-arrow-down"></i></div>`);
@@ -255,6 +265,7 @@
                 }
 
             },
+
             error: function() {
                 // Obsłuż ewentualne błędy zapytania
                 console.error('Wystąpił błąd podczas pobierania danych meczu.');
@@ -270,6 +281,14 @@
     if (gameId) {
         updateGameData(gameId);
     }
+
+        // Cykliczne odświeżanie co minutę (60000 milisekund)
+        setInterval(function() {
+            console.log('robie');
+            updateGameData(gameId);
+        }, 60000);
+
+    });
 </script>
 </body>
 </html>

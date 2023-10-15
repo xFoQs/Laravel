@@ -358,6 +358,7 @@
                     $('input[name="game_id"]').val(activeGameId);
                     $('input[name="league_id"]').val(response.leagueID);
                     $('input[name="season_id"]').val(response.seasonID);
+                    $('.badge-primary').text(response.status);
                     gameDataContainer.html(`
                     <div style="padding-top: 3rem; display: flex; align-items: center; justify-content: center;">
                         <div class="match" style="width: 90%;">
@@ -377,9 +378,9 @@
                                 <div class="column">
                                     <div class="match-details">
                                         <div class="match-score">
-                                            <span class="match-score-number">${response.result1 !== null ? response.result1 : '0'}</span>
+                                            <span class="match-score-number">${response.result1 !== null ? response.result1 : '?'}</span>
                                             <span class="match-score-divider">:</span>
-                                            <span class="match-score-number">${response.result2 !== null ? response.result2 : '0'}</span>
+                                            <span class="match-score-number">${response.result2 !== null ? response.result2 : '?'}</span>
                                         </div>
                                         <div class="match-status">${response.status}</div>
                                     </div>
@@ -446,6 +447,9 @@
 
                         </div>
                     </div>
+
+
+
                 `);
 
                     // Ustaw wartość początkową dla zmiennej gameStatus na wartość pobraną z serwera
