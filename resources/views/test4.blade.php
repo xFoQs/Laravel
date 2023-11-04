@@ -5,7 +5,7 @@
         <div class="col-8 mb-4">
             <div class="card">
                 <h3 class="card-header">
-                    Statystyki
+                    Tabela punktowa
                 </h3>
                 <div class="card-body">
                     <form id="standings-form" action="{{ route('statistics') }}" method="GET">

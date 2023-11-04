@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\GameController;
 use App\Http\Controllers\Admin\PlayerController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -41,27 +42,46 @@ Route::get('/gamedata/{gameId}', [\App\Http\Controllers\GameData::class, 'update
 
 
 
+
 Route::get('login', [AuthController::class, 'index'])->name('login');
 Route::post('post-login', [AuthController::class, 'postLogin'])->name('login.post');
-Route::get('registration', [AuthController::class, 'registration'])->name('register');
-Route::post('post-registration', [AuthController::class, 'postRegistration'])->name('register.post');
 
 Route::group(['middleware' => ['auth']], function () {
 
 
+    Route::middleware(['auth', 'checkUserRole'])->group(function () {
+        Route::get('/users',  [UserController::class, 'index'])->name('users');
+        // Dodaj inne trasy wymagające roli 1 tutaj
+    });
+
+Route::get('registration', [AuthController::class, 'registration'])->name('register');
 Route::get('dashboard', [AuthController::class, 'dashboard']);
+Route::post('post-registration', [AuthController::class, 'postRegistration'])->name('register.post');
 
 Route::get('players', [PlayerController::class, 'index']);
 Route::get('teams', [TeamController::class, 'index']);
 Route::get('games', [GameController::class, 'index']);
 
+Route::get('seasons', [\App\Http\Controllers\Admin\SeasonController::class, 'index']);
+
+    Route::get('leagues', [\App\Http\Controllers\Admin\LeagueController::class, 'index']);
+
+    Route::post('/leagues',[\App\Http\Controllers\Admin\LeagueController::class, 'store'])->name('league.store');
+
+    Route::get('/leaguesdeleted', [\App\Http\Controllers\Admin\LeagueController::class, 'destroy'])->name('leagues.delete');
+
+    Route::post('/leaguesupdated', [\App\Http\Controllers\Admin\LeagueController::class, 'update'])->name('league.update');
+
 
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::post('/players',[PlayerController::class, 'store'])->name('player.store');
+Route::post('/seasons',[\App\Http\Controllers\Admin\SeasonController::class, 'store'])->name('season.store');
+Route::get('/seasonsdeleted', [\App\Http\Controllers\Admin\SeasonController::class, 'destroy'])->name('seasons.delete');
 Route::post('/teams',[TeamController::class, 'store'])->name('team.store');
 Route::get('deleted',[PlayerController::class, 'destroy'])->name('player.delete');
 Route::get('teamsdeleted',[TeamController::class, 'destroy'])->name('team.delete');
 Route::post('/teamsupdated', [TeamController::class, 'update'])->name('team.update');
+    Route::post('/seasonsupdated', [\App\Http\Controllers\Admin\SeasonController::class, 'update'])->name('season.update');
 
 Route::get('/update', [PlayerController::class, 'edit'])->name('player.update');
     Route::post('/update', [PlayerController::class, 'update'])->name('update');

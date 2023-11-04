@@ -4,8 +4,10 @@
     <div class="row mt-5 justify-content-center">
         <div class="col-8 mb-4">
             <div class="card">
+                <h3 class="card-header">
+                    Zawodnicy
+                </h3>
                 <div class="card-body">
-
                     <form id="filter-form" action="{{ route('player.filter') }}" method="GET">
                         <div class="card-body">
                             <div class="form-group">
@@ -51,8 +53,14 @@
                             <th scope="row">{{ $index++ }}</th>
                             <td>{{ $player->name }} {{ $player->surname }}</td>
                             <td>{{ $player->team ? $player->team->name : '' }}</td>
-                            <td>
-                                <span class="goal-count{{ $player->id }}{{ $player->goals_count > 0 ? ' text-primary' : '' }}" data-bs-toggle="modal" data-bs-target="#goalsModal{{ $player->id }}">{{ $player->goals_count }}</span>
+                            <td  class="text-center">
+    <span class="goal-count{{ $player->id }}{{ $player->goals_count > 0 ? ' text-primary' : '' }}" data-bs-toggle="modal" data-bs-target="#goalsModal{{ $player->id }}">
+        @if ($player->goals_count > 0)
+            <span class="badge bg-primary">{{ $player->goals_count }}</span>
+        @else
+            <span class="badge bg-primary">{{ $player->goals_count }}</span>
+        @endif
+    </span>
                             </td>
                         </tr>
                     @endforeach
@@ -68,11 +76,32 @@
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="goalsModalLabel{{ $player->id }}">Mecze zawodnika: {{ $player->name }} {{ $player->surname }}</h5>
+                        <h5 class="modal-title" id="goalsModalLabel{{ $player->id }}">Informacje o zawodniku</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <table class="table">
+                        <div class="row" style="padding-bottom: 1rem;">
+                            <div class="col-md-4">
+                                <div class="form">
+                                    <div>
+                                        <div class="mb-4 d-flex justify-content-center">
+                                            <img id="preview{{ $player->id }}" src="{{ $player->photo ? asset('img/' . $player->photo) : asset('img/man.png') }}"
+                                                 alt="example placeholder" style="width: 190px; height: 200px;" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <ul class="list-group">
+                                    <li class="list-group-item"><strong>Imię i Nazwisko:</strong> {{ $player->name }} {{ $player->surname }}</li>
+                                    <li class="list-group-item"><strong>Data urodzenia:</strong> {{ $player->birth_date }}</li>
+                                    <li class="list-group-item"><strong>Pozycja:</strong> {{ $player->position }}</li>
+                                    <li class="list-group-item"><strong>Narodowość:</strong> {{ $player->country }}</li>
+                                    <li class="list-group-item"><strong>Drużyna:</strong> {{ $player->team->name }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <table class="table table-borderless">
                             <thead class="table bg-primary" style="color: white;">
                             <tr>
                                 <th scope="col">Gospodarze</th>
@@ -103,11 +132,11 @@
                                 @if(!in_array($gameId, $processedGames))
                                     <tr>
                                         <td>{{ $homeTeam->name }}</td>
-                                        <td>{{ $result1 }} : {{ $result2 }}</td>
+                                        <td><span class="badge bg-primary">{{ $result1 }} : {{ $result2 }}</span></td>
                                         <td>{{ $awayTeam->name }}</td>
-                                        <td>{{ $game->start_time }}</td>
+                                        <td><span class="badge bg-success">{{ $game->start_time }}</span></td>
                                         <td>{{ $league->name }}</td>
-                                        <td>{{ $goalsInGame }}</td>
+                                        <td><span class="badge bg-info">{{ $goalsInGame }}</span></td>
                                     </tr>
                                     @php
                                         $processedGames[] = $gameId;
@@ -116,7 +145,7 @@
                             @endforeach
                             <tr>
                                 <td colspan="5" class="text-end fw-bold">Suma bramek:</td>
-                                <td>{{ $totalGoals }}</td>
+                                <td><span class="badge bg-info">{{ $totalGoals }}</span></td>
                             </tr>
                             </tbody>
                         </table>

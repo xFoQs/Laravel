@@ -101,11 +101,15 @@
                                         </span>
                                     </td>
                                     <td style="width: 32%; text-align: right; padding: 4px;">{{ $game->team1->name }}</td>
-                                    <td style="width: 6%; text-align: center; padding: 4px;">
+                                    <td style="width: 8%; text-align: center; padding: 4px;">
                                         <a href="game_data?game_id={{ $game->id }}" target="_blank" style="color: #0043de;">
-                                            <strong>{{ $game->result1 !== null ? $game->result1 : '?' }}</strong>
+        <span class="badge bg-primary">
+            <strong>{{ $game->result1 !== null ? $game->result1 : '?' }}</strong>
+        </span>
                                             :
-                                            <strong>{{ $game->result2 !== null ? $game->result2 : '?' }}</strong>
+                                            <span class="badge bg-primary">
+            <strong>{{ $game->result2 !== null ? $game->result2 : '?' }}</strong>
+        </span>
                                         </a>
                                     </td>
                                     <td style="width: 32%; text-align: left; padding: 4px;">{{ $game->team2->name }}</td>

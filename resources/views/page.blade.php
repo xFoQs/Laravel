@@ -25,7 +25,7 @@
                 <li><a href="#footer">Kontakt</a></li>
             </ul>
             <div class="login">
-                <a target="_blank" href="{{ route('login') }}"><i class="fas fa-sign-in-alt"></i>Login</a>
+                <a target="_blank" href="{{ route('login') }}"><i class="fas fa-sign-in-alt"></i>Zaloguj</a>
             </div>
         </div>
     </div>

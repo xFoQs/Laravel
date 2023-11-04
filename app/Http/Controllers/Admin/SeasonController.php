@@ -11,24 +11,38 @@ class SeasonController extends Controller
     public function index()
     {
         $seasons = Season::all();
-        return view('Admin.players', compact('seasons'));
+        return view('Admin.seasons', compact('seasons'));
     }
 
-    public function create()
-    {
-        return view('seasons.create');
-    }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:seasons',
-        ]);
+        $season = new Season();
+        $season->name = $request->input('name');
 
-        Season::create([
-            'name' => $request->input('name'),
-        ]);
+        $season->save();
 
-        return redirect()->route('seasons.index')->with('success', 'Sezon został dodany.');
+        return redirect()->intended('seasons')->withSuccess('Rekord został dodany pomyślnie');
+    }
+
+    public function destroy(Request $id)
+    {
+        $season = Season::find($id->event_id);
+        $season->delete();
+
+        return $season;
+    }
+
+    public function update(Request $request)
+    {
+
+        $season = Season::findOrFail($request->id);
+
+        $season->name = $request->input('name');
+
+        $season->save();
+
+        return redirect()->intended('seasons')->withUpdate('Rekord został zaktualizowany pomyślnie');
+
     }
 }

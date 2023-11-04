@@ -30,7 +30,7 @@
      */
     public function registration()
     {
-        return view('auth.registration');
+        return view('admin.registration');
     }
 
     /**
@@ -48,10 +48,10 @@
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             return redirect()->intended('dashboard')
-                        ->withSuccess('You have Successfully loggedin');
+                        ->withSuccess('Zostałeś zalogowany');
         }
 
-        return redirect("login")->withError('Oppes! You have entered invalid credentials');
+        return redirect("login")->withError('Niepoprawny email lub hasło');
     }
 
     /**
@@ -59,19 +59,41 @@
      *
      * @return response()
      */
-    public function postRegistration(Request $request)
-    {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-        ]);
+      public function postRegistration(Request $request)
+      {
+          $request->validate([
+              'name' => 'required',
+              'surname' => 'required',
+              'email' => 'required|email|unique:users',
+              'password' => 'required|min:6', // Hasło musi mieć co najmniej 6 znaków
+              'role' => 'required|in:1,2', // Upewnij się, że jest 1 lub 2
+          ], [
+              'email.unique' => 'Email jest już zajęty.',
+              'password.min' => 'Hasło musi zawierać co najmniej 6 znaków.',
+          ]);
 
-        $data = $request->all();
-        $check = $this->create($data);
+          try {
+              // Tworzenie nowego użytkownika
+              $user = new User();
+              $user->name = $request->name;
+              $user->surname = $request->surname;
+              $user->email = $request->email;
+              $user->password = Hash::make($request->password);
+              $user->role_id = $request->role; // Przypisanie roli bez mapowania
 
-        return redirect("dashboard")->withSuccess('Great! You have Successfully loggedin');
-    }
+              $user->save();
+
+              return redirect()->intended('registration')->withSuccess('Gratulacje! Utworzyłeś konto');
+          } catch (\Exception $e) {
+              if (strpos($e->getMessage(), 'Integrity constraint violation') !== false) {
+                  // Obsługa wyjątku w przypadku, gdy adres email jest już zajęty
+                  return back()->withErrors(['email' => 'Ten adres email jest już używany.'])->withInput();
+              } else {
+                  // Obsługa innych błędów
+                  return back()->withErrors(['generic' => 'Wystąpił błąd podczas rejestracji.'])->withInput();
+              }
+          }
+      }
 
     /**
      * Write code on Method

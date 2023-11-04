@@ -36,24 +36,23 @@
 
                                         </div>
 
-                                        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your
-                                            account</h5>
+                                        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Zaloguj na konto</h5>
 
                                         <div class="form-outline mb-4">
                                             <input type="email" id="email" class="form-control form-control-lg"
                                                 name="email" />
-                                            <label class="form-label" for="form2Example17">Email address</label>
-                                            <div class="invalid-feedback">Please choose a username.</div>
+                                            <label class="form-label" for="form2Example17">Adres email</label>
+                                            <div class="invalid-feedback">Wybierz użytkownika</div>
                                         </div>
 
                                         <div class="form-outline mb-4">
                                             <input type="password" id="form2Example27"
                                                 class="form-control form-control-lg" name="password" />
-                                            <label class="form-label" for="form2Example27">Password</label>
+                                            <label class="form-label" for="form2Example27">Hasło</label>
                                         </div>
 
-                                        <div class="pt-1 mb-4">
-                                            <button class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
+                                        <div class="pt-1 mb-4" style="padding-bottom: 5rem;">
+                                            <button class="btn btn-dark btn-lg btn-block" type="submit">Zaloguj</button>
                                         </div>
 
                                         @if (Session::has('error'))
@@ -75,11 +74,6 @@
                                         </div>
                                         @endif
 
-                                        <a class="small text-muted" href="#!">Forgot password?</a>
-                                        <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account? <a
-                                                href="#!" style="color: #393f81;">Register here</a></p>
-                                        <a href="#!" class="small text-muted">Terms of use.</a>
-                                        <a href="#!" class="small text-muted">Privacy policy</a>
                                     </form>
 
                                 </div>

@@ -38,6 +38,14 @@ class PlayerController extends Controller
         $seasonNames = $request->input('season_name');
         $teamIds = $request->input('season_team_id');
 
+        if ($request->hasFile('customFile')) {
+            $file = $request->file('customFile');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = uniqid() . '.' . $extension;
+            $file->move(public_path('img'), $fileName);
+            $player->photo = $fileName;
+        }
+
         for ($i = 0; $i < count($seasonNames); $i++) {
             $seasonId = $seasonNames[$i];
             $teamId = $teamIds[$i];
@@ -63,6 +71,28 @@ class PlayerController extends Controller
             $player->position = $request->position;
             $player->country = $request->country;
             $player->team_id = $request->input('season_team_id.' . $player->id . '.0'); // Pobierz wartość pierwszego elementu z season_team_id
+
+            if ($request->hasFile('customFile')) {
+                $image = $request->file('customFile');
+
+                // Usuń poprzednie zdjęcie, jeśli istnieje
+                if ($player->photo) {
+                    $existingImagePath = public_path('img') . '/' . $player->photo;
+                    if (file_exists($existingImagePath)) {
+                        unlink($existingImagePath);
+                    }
+                }
+
+                // Generuj unikalną nazwę pliku
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                // Możesz również użyć UUID jako unikalnej nazwy pliku:
+                // $imageName = Str::uuid() . '.' . $image->getClientOriginalExtension();
+
+                // Zapisz nowe zdjęcie
+                $image->move(public_path('img'), $imageName);
+                $player->photo = $imageName;
+            }
+
             $player->save();
 
             // Aktualizuj dane kariery zawodnika

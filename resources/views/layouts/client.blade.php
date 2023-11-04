@@ -35,13 +35,13 @@
             <a class="nav-link text-white" href="{{ route('page') }}">Strona główna</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-white" href="{{ route('test') }}">Mecze</a>
+            <a class="nav-link text-white" href="{{ route('test') }}">Terminarz</a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-white" href="{{ route('test3') }}">Zawodnicy</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-white" href="{{ route('test2') }}">Tabele</a>
+            <a class="nav-link text-white" href="{{ route('test2') }}">Tabele Punktowe</a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-white" href="{{ route('test4') }}">Statystyki</a>

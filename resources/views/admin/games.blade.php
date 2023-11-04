@@ -30,16 +30,34 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
+    <style>
 
+        #example_filter input[type="search"] {
+            width: 100%; /* Ustaw szerokość pola wyszukiwania na 100% szerokości elementu example_filter */
+            height: 40px;
+        }
+    </style>
 
 </head>
 
 <body id="body-pd">
 
 <header class="header" id="header">
-    <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
-    <div>
-        <b>Witaj</b> {{ auth()->user()->name }} !
+    <div class="header_toggle">
+        <i class='bx bx-menu' id="header-toggle"></i>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between">
+        <a href="/livegame" data-bs-toggle="tooltip" data-bs-placement="top" title="Relacja live">
+            <i class="fas fa-headset"></i>
+            <span class="badge rounded-pill badge-notification bg-danger"><span id="matchCount"></span></span>
+        </a>
+
+
+        <div class="d-flex align-items-center m-1">
+            <div class="vertical-line mx-3"></div>
+            <b style="padding-right: 2px;">Witaj, </b> {{ auth()->user()->name }} !
+        </div>
     </div>
 </header>
 
@@ -47,20 +65,13 @@
 
 <div id="content" style="padding-top:5rem; height:100%;">
 
-    <div class="contenthead" style="display:flex; justify-content:space-between; margin-bottom:1rem; margin-top: 2rem">
-
-        <div><h2 style="padding-right:2rem;">Zarządzaj meczami</h2></div>
+    <div class="contenthead" style="display: flex; align-items: stretch; margin-bottom: 1rem; margin-top: 2rem; align-content: center;">
+        <h1 style="margin-right: 1rem;">Zarządzaj meczami</h1>
         <!-- Button trigger modal -->
         <div>
-            <button type="button" class="btn btn-outline-primary btn-rectangle" data-bs-toggle="modal"
-                    data-bs-target="#staticBackdrop">
-                Dodaj Mecz
+            <button type="button" class="btn btn-success btn-rounded" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="height: 50px; width: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
+                <i class="fas fa-plus" style="font-size: 20px;"></i>
             </button>
-
-            <a href="/livegame" class="btn btn-outline-primary btn-rectangle">
-                Prowadź relacje <span id="matchCount"></span>
-            </a>
-
         </div>
     </div>
 
@@ -88,8 +99,8 @@
 
 <br>
 <div style="width: 100%; margin: 0 auto;">
-    <table id="example" class="table table-bordered display" style="width:100%">
-        <thead>
+    <table id="example" class="table table-borderless" style="width:100%; padding-top: 1rem;">
+        <thead class="table p-3 mb-2 bg-primary" style="color: white;">
         <tr>
             <th>No</th>
             <th>Nazwa</th>
@@ -99,7 +110,7 @@
             <th>Godzina</th>
             <th>Sezon</th>
             <th>Wynik Meczu</th>
-            <th>Action</th>
+            <th>Akcje</th>
         </tr>
         </thead>
         <tbody>
@@ -109,34 +120,44 @@
                 $localizedTime = \Carbon\Carbon::parse($game->start_time)->format('H:i');
             @endphp
             <tr class="searchPanes-value" data-entry-id="{{ $game->id }}">
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $game->team1->name }} - {{ $game->team2->name }}</td>
-                <td>{{ $game->league->name }}</td>
-                <td>{{ explode('-', $game->round)[0] }}</td>
-                <td>{{ $localizedDate->isoFormat('D MMMM YYYY') }}</td>
-                <td>{{ $localizedTime }}</td>
-                <td>{{ $game->season->name ?? 'Brak sezonu' }}</td>
-                <td>
+                <td class="align-middle">
+                    {{ $loop->iteration }}
+                </td>
+                <td class="align-middle">
+                    {{ $game->team1->name }}
+                    -
+                    {{ $game->team2->name }}
+                </td>
+                <td class="align-middle">{{ $game->league->name }}</td>
+                <td class="align-middle">{{ explode('-', $game->round)[0] }}</td>
+                <td class="align-middle">{{ $localizedDate->isoFormat('D MMMM YYYY') }}</td>
+                <td class="align-middle">
+                    <span class="badge bg-info"> {{ $localizedTime }} </span>
+                </td>
+                <td class="align-middle">{{ $game->season->name ?? 'Brak sezonu' }}</td>
+                <td class="align-middle text-center">
                     @if ($game->result1 !== null && $game->result2 !== null)
-                        {{ $game->result1 }}:{{ $game->result2 }}
+                        <span class="badge bg-primary">{{ $game->result1 }}:{{ $game->result2 }}</span>
                     @endif
                 </td>
                 <td>
-                    <a class="toggle-match" data-game-id="{{ $game->id }}">
+                    <button class="btn btn-success btn-sm toggle-match" data-game-id="{{ $game->id }}" title="Dodaj/Usuń z relacji">
                         @if (in_array($game->id, $selectedGames))
-                            <i class="fa-solid fa-minus-circle minus-icon" style="color:#4f4f4f; padding-right: 0.5rem;" title="Usuń z relacji"></i>
-                            <i class="fa-solid fa-plus-circle plus-icon hidden" style="color:#4f4f4f; padding-right: 0.5rem;" title="Dodaj do relacji"></i>
+                            <i class="fa-solid fa-minus-circle minus-icon" style="color:white;"></i>
+                            <i class="fa-solid fa-plus-circle plus-icon hidden" style="color:white;" title="Dodaj do relacji"></i>
                         @else
-                            <i class="fa-solid fa-minus-circle minus-icon hidden" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
-                            <i class="fa-solid fa-plus-circle plus-icon" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
+                            <i class="fa-solid fa-minus-circle minus-icon hidden" style="color:white;"></i>
+                            <i class="fa-solid fa-plus-circle plus-icon" style="color:white;" title="Dodaj do relacji"></i>
                         @endif
-                    </a>
-                    <a data-bs-toggle="modal" data-bs-target="#edit_game_{{ $game->id }}" data-game-id="{{ $game->id }}">
-                        <i class="fa-solid fa-pen-to-square" style="color:#4f4f4f; padding-right: 0.5rem;"></i>
-                    </a>
-                    <a href="#" class="delete" id="{{ $game->id }}">
-                        <i class="fa-solid fa-trash" style="color:#4f4f4f;"></i>
-                    </a>
+                    </button>
+
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#edit_game_{{ $game->id }}" data-game-id="{{ $game->id }}" title="Edycja">
+                        <i class="fa-solid fa-pen-to-square" style="color:white;"></i>
+                    </button>
+
+                    <button class="btn btn-danger btn-sm delete" id="{{ $game->id }}" title="Usuń">
+                        <i class="fa-solid fa-trash" style="color:white;"></i>
+                    </button>
                 </td>
             </tr>
         @endforeach
@@ -224,8 +245,8 @@
                     </div>
                     <div class="col-12">
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" name="add" value="add" class="btn btn-primary">Send</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                            <button type="submit" name="add" value="add" class="btn btn-primary">Wyślij</button>
                         </div>
                     </div>
                 </form>
@@ -323,9 +344,9 @@
                             <!-- <button class="btn btn-primary" type="submit">Submit form</button> -->
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Close</button>
+                                        data-bs-dismiss="modal">Zamknij</button>
                                 <button type="submit" name="add" value="add"
-                                        class="btn btn-primary">Send</button>
+                                        class="btn btn-primary">Wyślij</button>
                             </div>
                         </div>
                     </form>
@@ -581,38 +602,45 @@
 <script>
     $(document).ready(function() {
         var table = $('#example').DataTable({
-            paging: false,
-            searchPanes: true,
+            paging: true,
+            searchPanes: {
+                collapse: false
+            },
             dom: 'PBfrtip',
             buttons: [
                 {
                     extend: 'copyHtml5',
+                    text: 'Kopiuj', // Zmienione "Copy" na "Kopiuj"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
                     extend: 'csvHtml5',
+                    text: 'CSV', // Zmienione "CSV" na "CSV"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
                     extend: 'excelHtml5',
+                    text: 'Excel', // Zmienione "Excel" na "Excel"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
                     extend: 'pdfHtml5',
+                    text: 'PDF', // Zmienione "Pdf" na "Pdf"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
                     extend: 'print',
+                    text: 'Drukuj', // Zmienione "Print" na "Drukuj"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3, 4]
                     }
                 }
             ],
@@ -621,14 +649,23 @@
                     clearMessage: 'Wyczyść',
                     collapse: {
                         0: 'Pokaż',
-                        _: 'Pokaż wszystko (%d)'
+                        _: 'Pokaż wszystko (%d)',
                     },
                     count: '{total}',
-                    countFiltered: '{shown} ({total})',
                     emptyPanes: 'Brak danych do wyświetlenia',
                     loadMessage: 'Ładowanie filtrów...',
-                    title: 'Filtry aktywne - %d'
+                    title: 'Filtry aktywne - %d',
+                    viewTotal: false, // Usunięcie komunikatu "filtered from 30 total entries"
                 },
+                paginate: {
+                    first: 'Pierwsza',
+                    previous: 'Poprzednia',
+                    next: 'Następna',
+                    last: 'Ostatnia',
+                },
+                info: '',
+                infoFiltered: "",
+                search: '',
             },
 
             columnDefs: [
@@ -656,6 +693,19 @@
         }
 
         refreshTable();
+
+        // Znajdź pole wyszukiwania DataTables
+        var searchInput = $('input[type="search"]');
+
+        // Ustaw atrybut "placeholder" na wartość "Szukaj..."
+        searchInput.attr('placeholder', 'Szukaj...');
+
+        // Dodaj ikonę lupy do pola wyszukiwania
+        searchInput.before('<i class="fas fa-search" style="color: gray; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;"></i>');
+
+        // Stylizacja ikony i pola wyszukiwania
+        searchInput.parent().css('position', 'relative');
+        searchInput.css('padding-left', '25px');
     });
 
 </script>
