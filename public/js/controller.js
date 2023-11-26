@@ -57,3 +57,11 @@ function advanceRowEntry(thisBracketRow) {
 function revertRowEntry(thisBracketRow) {
     _B.revertRowEntry(thisBracketRow);
 }
+
+
+function handleTeamsFile() {
+    const fileInput = document.getElementById('teams-file');
+    _E_List.loadTeamsFromFile(fileInput);
+    // Reset input field value to allow importing the same file multiple times
+    fileInput.value = '';
+}

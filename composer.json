@@ -11,7 +11,8 @@
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
         "pragmarx/countries": "^v0.7.0",
-        "pragmarx/countries-laravel": "*"
+        "pragmarx/countries-laravel": "*",
+        "realrashid/sweet-alert": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

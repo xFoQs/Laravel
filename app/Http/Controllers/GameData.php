@@ -75,9 +75,11 @@ class GameData extends Controller
         $yellowcard2 = YellowCard2::where('game_id', $gameId)->with('player')->get();
         $missedpenalty = MissedPenalty::where('game_id', $gameId)->with('player')->get();
         $suicidegoals = SuicideGoal::where('game_id', $gameId)->with('player')->get();
-        $message = Information::where('game_id', $gameId)->get();
-        $change = Change::where('game_id', $gameId)->with('player')->get();
 
+        // Pobierz dane z tabeli "information" na podstawie game_id
+        $information = Information::where('game_id', $gameId)->pluck('message')->first();
+
+        $change = Change::where('game_id', $gameId)->with('player')->get();
 
         // Dodaj dane goli do $gameData
         $gameData['goals'] = $goals;
@@ -85,7 +87,7 @@ class GameData extends Controller
         $gameData['yellowCards2'] = $yellowcard2;
         $gameData['missedpenalty'] = $missedpenalty;
         $gameData['suicidegoals'] = $suicidegoals;
-        $gameData['message'] = $message;
+        $gameData['message'] = $information;
         $gameData['change'] = $change;
 
         return response()->json($gameData);

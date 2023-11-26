@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\Team;
 use App\Models\League;
 use App\Models\Season;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
@@ -17,6 +18,7 @@ class GameController extends Controller
     public function index(): View
     {
         $games = Game::all();
+        $users = User::all();
         $leagues = League::pluck('name', 'id');
         $teams = Team::pluck('name', 'id');
         $seasons = Season::all();
@@ -28,7 +30,7 @@ class GameController extends Controller
             $selectedGames = json_decode($_COOKIE['selectedGames'], true);
         }
 
-        return view('admin.games', compact('games', 'teams', 'leagues', 'seasons', 'selectedGames'));
+        return view('admin.games', compact('games', 'teams', 'leagues', 'seasons', 'selectedGames','users'));
     }
 
     public function store(Request $request)

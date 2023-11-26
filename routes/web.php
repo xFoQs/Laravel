@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\GameController;
 use App\Http\Controllers\Admin\PlayerController;
 use App\Http\Controllers\Admin\TeamController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -49,14 +50,23 @@ Route::post('post-login', [AuthController::class, 'postLogin'])->name('login.pos
 Route::group(['middleware' => ['auth']], function () {
 
 
+
+
+
     Route::middleware(['auth', 'checkUserRole'])->group(function () {
         Route::get('/users',  [UserController::class, 'index'])->name('users');
         // Dodaj inne trasy wymagające roli 1 tutaj
     });
 
+
+    Route::post('/user/update-role/{id}', [UserController::class, 'updateRole'])->name('user.updateRole');
+
 Route::get('registration', [AuthController::class, 'registration'])->name('register');
 Route::get('dashboard', [AuthController::class, 'dashboard']);
+    Route::get('dashboard2', [AdminController::class, 'dashboard']);
 Route::post('post-registration', [AuthController::class, 'postRegistration'])->name('register.post');
+
+    Route::post('/change-password', [AuthController::class, 'changePassword'])->name('change');
 
 Route::get('players', [PlayerController::class, 'index']);
 Route::get('teams', [TeamController::class, 'index']);
@@ -69,6 +79,8 @@ Route::get('seasons', [\App\Http\Controllers\Admin\SeasonController::class, 'ind
     Route::post('/leagues',[\App\Http\Controllers\Admin\LeagueController::class, 'store'])->name('league.store');
 
     Route::get('/leaguesdeleted', [\App\Http\Controllers\Admin\LeagueController::class, 'destroy'])->name('leagues.delete');
+
+    Route::get('/usersdeleted', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.delete');
 
     Route::post('/leaguesupdated', [\App\Http\Controllers\Admin\LeagueController::class, 'update'])->name('league.update');
 
@@ -96,9 +108,11 @@ Route::get('/update', [PlayerController::class, 'edit'])->name('player.update');
     Route::get('/get-game-teams', [GameController::class, 'getGameTeams']);
     Route::get('/get-game-live', [GameController::class, 'getGameLive']);
 
+
     Route::get('/livegame',[\App\Http\Controllers\Admin\LiveGameController::class, 'index']);
     Route::post('/select-game', [LiveGameController::class, 'selectGame'])->name('select.game');
     Route::post('/admin/games/{gameId}/status', [\App\Http\Controllers\Admin\LiveGameController::class, 'updateGameStatus']);
+    Route::post('/games/{game}/status', [\App\Http\Controllers\Admin\LiveGameController::class, 'updateGameStatus2']);
     Route::get('/admin/livegame/{gameId}', [App\Http\Controllers\Admin\LiveGameController::class, 'updateGameData'])->name('admin.livegame.updateGameData');
 
     Route::get('/players/{teamId}/{seasonId}', [App\Http\Controllers\Admin\LiveGameController::class, 'getPlayersByTeamAndSeason']);

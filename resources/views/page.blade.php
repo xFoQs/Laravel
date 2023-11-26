@@ -22,7 +22,6 @@
                 <li><a href="{{ route('test') }}">Rozgrywki</a></li>
                 <li><a href="{{ route('tournament') }}">Turniej</a></li>
                 <li><a href="#matches">Nadchodzące mecze</a></li>
-                <li><a href="#footer">Kontakt</a></li>
             </ul>
             <div class="login">
                 <a target="_blank" href="{{ route('login') }}"><i class="fas fa-sign-in-alt"></i>Zaloguj</a>
@@ -173,86 +172,86 @@
         </div>
     </section>
     <!-- ----------match-fixture---------- -->
-    <section id="recent-tweets">
-        <div class="title">
-            <h2>Recent Tweets</h2>
-        </div>
-        <div class="container">
-            <div class="flex-container">
-                <div class="col-3">
-                    <div class="tweetBody">
-                        <div class="tweet-title">
-                            <h3>Lionel Messi</h3>
-                            <i class="fas fa-share"></i>
-                        </div>
-                        <p>Reaching this historic milestone of 644 goals with the same club gives me a lot of joy, but what is really more important is being able to give something back to the kids struggling with their health.
-                        </p>
-                    </div>
-                    <hr>
-                    <div class="bottom">
-                        <div class="name">
-                            <p>@liomessi</p>
-                            <small>3 july, 2021</small>
-                        </div>
-                        <i class="fab fa-twitter"></i>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="tweetBody">
-                        <div class="tweet-title">
-                            <h3>Neymar Jr</h3>
-                            <i class="fas fa-share"></i>
-                        </div>
-                        <p>Reaching this historic milestone of 644 goals with the same club gives me a lot of joy, but what is really more important is being able to give something back to the kids struggling with their health.
-                        </p>
-                    </div>
-                    <hr>
-                    <div class="bottom">
-                        <div class="name">
-                            <p>@neimarjr</p>
-                            <small>11 july, 2021</small>
-                        </div>
-                        <i class="fab fa-twitter"></i>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="tweetBody">
-                        <div class="tweet-title">
-                            <h3>Cristiano Ronaldo</h3>
-                            <i class="fas fa-share"></i>
-                        </div>
-                        <p>Reaching this historic milestone of 644 goals with the same club gives me a lot of joy, but what is really more important is being able to give something back to the kids struggling with their health.
-                        </p>
-                    </div>
-                    <hr>
-                    <div class="bottom">
-                        <div class="name">
-                            <p>@ronaldo</p>
-                            <small>21 july, 2021</small>
-                        </div>
-                        <i class="fab fa-twitter"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-</main>
-<!-- ---------main-------- -->
+{{--    <section id="recent-tweets">--}}
+{{--        <div class="title">--}}
+{{--            <h2>Recent Tweets</h2>--}}
+{{--        </div>--}}
+{{--        <div class="container">--}}
+{{--            <div class="flex-container">--}}
+{{--                <div class="col-3">--}}
+{{--                    <div class="tweetBody">--}}
+{{--                        <div class="tweet-title">--}}
+{{--                            <h3>Lionel Messi</h3>--}}
+{{--                            <i class="fas fa-share"></i>--}}
+{{--                        </div>--}}
+{{--                        <p>Reaching this historic milestone of 644 goals with the same club gives me a lot of joy, but what is really more important is being able to give something back to the kids struggling with their health.--}}
+{{--                        </p>--}}
+{{--                    </div>--}}
+{{--                    <hr>--}}
+{{--                    <div class="bottom">--}}
+{{--                        <div class="name">--}}
+{{--                            <p>@liomessi</p>--}}
+{{--                            <small>3 july, 2021</small>--}}
+{{--                        </div>--}}
+{{--                        <i class="fab fa-twitter"></i>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                <div class="col-3">--}}
+{{--                    <div class="tweetBody">--}}
+{{--                        <div class="tweet-title">--}}
+{{--                            <h3>Neymar Jr</h3>--}}
+{{--                            <i class="fas fa-share"></i>--}}
+{{--                        </div>--}}
+{{--                        <p>Reaching this historic milestone of 644 goals with the same club gives me a lot of joy, but what is really more important is being able to give something back to the kids struggling with their health.--}}
+{{--                        </p>--}}
+{{--                    </div>--}}
+{{--                    <hr>--}}
+{{--                    <div class="bottom">--}}
+{{--                        <div class="name">--}}
+{{--                            <p>@neimarjr</p>--}}
+{{--                            <small>11 july, 2021</small>--}}
+{{--                        </div>--}}
+{{--                        <i class="fab fa-twitter"></i>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                <div class="col-3">--}}
+{{--                    <div class="tweetBody">--}}
+{{--                        <div class="tweet-title">--}}
+{{--                            <h3>Cristiano Ronaldo</h3>--}}
+{{--                            <i class="fas fa-share"></i>--}}
+{{--                        </div>--}}
+{{--                        <p>Reaching this historic milestone of 644 goals with the same club gives me a lot of joy, but what is really more important is being able to give something back to the kids struggling with their health.--}}
+{{--                        </p>--}}
+{{--                    </div>--}}
+{{--                    <hr>--}}
+{{--                    <div class="bottom">--}}
+{{--                        <div class="name">--}}
+{{--                            <p>@ronaldo</p>--}}
+{{--                            <small>21 july, 2021</small>--}}
+{{--                        </div>--}}
+{{--                        <i class="fab fa-twitter"></i>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    </section>--}}
+{{--</main>--}}
+{{--<!-- ---------main-------- -->--}}
 
-<!-- ------footer------- -->
-<footer id="footer">
-    <div class="container">
-        <img src="images/Logo2.png" alt="">
-        <div class="social">
-            <a target="_blank" href="https://www.facebook.com/khayrulislam.66/"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"></a><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-google-plus-g"></i></a>
-            <a href="#"><i class="fab fa-whatsapp"></i></a>
-        </div>
-        <p>Copyright &copy; 2023 by </p>
-    </div>
-</footer>
+{{--<!-- ------footer------- -->--}}
+{{--<footer id="footer">--}}
+{{--    <div class="container">--}}
+{{--        <img src="images/Logo2.png" alt="">--}}
+{{--        <div class="social">--}}
+{{--            <a target="_blank" href="https://www.facebook.com/khayrulislam.66/"><i class="fab fa-facebook-f"></i></a>--}}
+{{--            <a href="#"></a><i class="fab fa-twitter"></i></a>--}}
+{{--            <a href="#"><i class="fab fa-twitter"></i></a>--}}
+{{--            <a href="#"><i class="fab fa-google-plus-g"></i></a>--}}
+{{--            <a href="#"><i class="fab fa-whatsapp"></i></a>--}}
+{{--        </div>--}}
+{{--        <p>Copyright &copy; 2023 by </p>--}}
+{{--    </div>--}}
+{{--</footer>--}}
 <!-- ------footer------- -->
 
 <script>

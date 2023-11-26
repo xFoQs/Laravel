@@ -196,10 +196,14 @@
         @foreach ($games as $key => $game)
             <div class="col-12 col-md-4">
                 <div class="panel" data-game-id="{{ $game->id }}">
-                    <div style="width: 70%;"><span style="font-size: 14px;">
-        {{ $game->team1->name }} : {{ $game->team2->name }}
-        <span class="badge badge-primary">{{ $game->status }}</span>
-    </span></div>
+                    <div style="width: 70%;">
+                    <span id="status-{{ $game->id }}" style="font-size: 14px;">
+                        {{ $game->team1->name }} : {{ $game->team2->name }}
+                        <span class="badge badge-primary" data-game-id="{{ $game->id }}">
+        {{ $game->status }}
+    </span>
+                    </span>
+                    </div>
                     <div>
                         <a class="toggle-match" data-game-id="{{ $game->id }}">
                             <span class="tak" style="font-size: 14px;"></span>
@@ -337,17 +341,21 @@
 
             activeGameId = $(this).data('game-id');
 
+
             // Aktualizuj dane w divie "game-data-container"
             updateGameData(activeGameId);
 
             $('#form-section').show();
             $('#preview-section').show();
 
+
             // Sprawdź, czy opcja radio z drużyną została zaznaczona po zmianie panelu
         });
 
+
+
+
         function updateGameData(activeGameId) {
-            // Pobierz dane meczu z serwera
             $.ajax({
                 url: '/admin/livegame/' + activeGameId, // Endpoint do pobrania danych meczu
                 method: 'GET',
@@ -358,7 +366,6 @@
                     $('input[name="game_id"]').val(activeGameId);
                     $('input[name="league_id"]').val(response.leagueID);
                     $('input[name="season_id"]').val(response.seasonID);
-                    $('.badge-primary').text(response.status);
                     gameDataContainer.html(`
                     <div style="padding-top: 3rem; display: flex; align-items: center; justify-content: center;">
                         <div class="match" style="width: 90%;">
@@ -449,8 +456,9 @@
                     </div>
 
 
-
                 `);
+
+
 
                     // Ustaw wartość początkową dla zmiennej gameStatus na wartość pobraną z serwera
                     var gameStatus = response.status;
@@ -480,6 +488,7 @@
                             // Wywołaj funkcję do aktualizacji statusu gry na serwerze
                             updateGameStatus(activeGameId, statusValue);
                         });
+
                     });
 
                     function updateGameStatus(gameId, status) {
@@ -489,18 +498,21 @@
                             }
                         });
 
+
                         $.ajax({
                             url: '/admin/games/' + gameId + '/status',
                             method: 'POST',
                             data: { status: status },
                             success: function(response) {
                                 console.log('Status gry zaktualizowany!');
-                                updateGameData(activeGameId);
+
+                                updateGameData(gameId);
                             },
                             error: function(error) {
                                 console.error('Wystąpił błąd podczas aktualizacji statusu gry:', error);
                             }
                         });
+
                     }
 
                     var previewSection = $('#preview-section');
@@ -663,12 +675,41 @@
                         placeholder: 'Wybierz zawodnika',
                         allowClear: true
                     });
+
+                    // Dodaj ten fragment kodu na końcu funkcji
+                    var selectedStatus = response.status;
+                    var statusBadge = $('#status-' + activeGameId + ' .badge');
+
+                    // Zaktualizuj status w panelu na podstawie zaznaczonej opcji
+                    statusBadge.text(selectedStatus);
+                    statusBadge.removeClass().addClass('badge').addClass('badge-' + getBadgeClass(selectedStatus));
                 },
                 error: function(xhr, status, error) {
                     console.log(error);
                 }
             });
 
+        }
+
+        function getBadgeClass(status) {
+            switch (status) {
+                case 'Nierozegrany':
+                    return 'primary';
+                case 'Pierwsza połowa':
+                    return 'success';
+                case 'Przerwa':
+                    return 'warning';
+                case 'Druga połowa':
+                    return 'info';
+                case 'Dogrywka':
+                    return 'secondary';
+                case 'Karne':
+                    return 'dark';
+                case 'Koniec':
+                    return 'danger';
+                default:
+                    return 'primary';
+            }
         }
 
         $('.toggle-match').click(function() {
@@ -818,7 +859,11 @@
         $(document).on('click', '.btn-danger', function() {
             deleteGoal(this);
         });
+
+
     });
+
+
 </script>
 
 <script>
@@ -891,6 +936,8 @@
         // ...
     });
 </script>
+
+
 
 
 </body>

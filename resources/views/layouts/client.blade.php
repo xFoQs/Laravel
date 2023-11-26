@@ -26,27 +26,55 @@
 
     <title>Games</title>
 
+
+    <style>
+
+        ul.navbar-nav {
+            display: flex;
+            column-gap: 5rem;
+            background-color: #3498db;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 10px; /* Dodaj padding do zwiększenia rozmiaru */
+            margin: 0; /* Resetuj margines */
+        }
+
+        ul.navbar-nav li {
+            list-style: none;
+        }
+
+        ul.navbar-nav li a {
+            text-decoration: none;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+
+    </style>
+
 </head>
 
 <body>
+<ul style="column-gap: 5rem;" class="bg-primary navbar-nav d-flex justify-content-center flex-row align-items-center">
+    <li class="nav-item">
+        <a class="nav-link text-white" href="{{ route('page') }}">Strona główna</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-white" href="{{ route('test') }}">Terminarz</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-white" href="{{ route('test3') }}">Zawodnicy</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-white" href="{{ route('test2') }}">Tabele Punktowe</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-white" href="{{ route('test4') }}">Statystyki</a>
+    </li>
+</ul>
 <div class="container">
-    <ul style="column-gap: 5rem;" class="bg-primary navbar-nav d-flex justify-content-center flex-row align-items-center">
-        <li class="nav-item">
-            <a class="nav-link text-white" href="{{ route('page') }}">Strona główna</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" href="{{ route('test') }}">Terminarz</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" href="{{ route('test3') }}">Zawodnicy</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" href="{{ route('test2') }}">Tabele Punktowe</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" href="{{ route('test4') }}">Statystyki</a>
-        </li>
-    </ul>
 
     @yield('content')
 </div>

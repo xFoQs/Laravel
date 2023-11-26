@@ -3,6 +3,23 @@ class EntriesList {
         this.Entries = [];
     }
 
+    loadTeamsFromFile(fileInput) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const data = event.target.result;
+            const teamsArray = data.split('\n'); // Załóżmy, że każda drużyna jest w nowej linii
+
+            teamsArray.forEach((teamName) => {
+                const entry = new Entry(teamName.trim()); // Usuń białe znaki z początku i końca nazwy
+                this.addEntry(entry);
+            });
+        };
+
+        reader.readAsText(file);
+    }
+
     addEntry(entry) {
         function addDeleteButtonToNewEntry(newEntryElement) {
             let button = document.createElement("img");

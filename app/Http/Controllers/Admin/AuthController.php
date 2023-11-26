@@ -4,6 +4,7 @@
 
   use App\Http\Controllers\Controller;
   use App\Http\Controllers\response;
+  use RealRashid\SweetAlert\Facades\Alert;
   use App\Models\User;
   use Hash;
   use Illuminate\Http\Request;
@@ -103,7 +104,8 @@
     public function dashboard()
     {
         if(Auth::check()){
-            return view('admin.dashboard');
+            $users = User::all(); // Pobieranie wszystkich użytkowników z modelu User
+            return view('admin.dashboard', compact('users'));
         }
 
         return redirect("login")->withSuccess('Opps! You do not have access');
@@ -134,4 +136,29 @@
 
         return Redirect('login');
     }
+
+      public function changePassword(Request $request)
+      {
+          $request->validate([
+              'current_password' => 'required',
+              'new_password' => 'required|string|min:6|confirmed',
+          ]);
+
+          $user = Auth::user();
+
+          if (Hash::check($request->current_password, $user->password)) {
+              $user->password = Hash::make($request->new_password);
+              $user->save();
+
+              return response()->json([
+                  'password_changed' => true,
+                  'message' => 'Hasło zostało zmienione.',
+              ]);
+          } else {
+              return response()->json([
+                  'password_error' => true,
+                  'message' => 'Aktualne hasło jest nieprawidłowe.',
+              ]);
+          }
+      }
 }

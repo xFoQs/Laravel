@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Season;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,8 @@ class SeasonController extends Controller
     public function index()
     {
         $seasons = Season::all();
-        return view('Admin.seasons', compact('seasons'));
+    $users = User::all();
+        return view('Admin.seasons', compact('seasons','users'));
     }
 
 

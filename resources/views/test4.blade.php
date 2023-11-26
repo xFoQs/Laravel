@@ -85,7 +85,7 @@
 
                         <div style="display: inline-flex"><span style="font-weight: bold">{{ $selectedLeague->name }}</span> <span style="padding-left: 5px;">sezon: {{$selectedSeason->name}}</span></div>
 
-                        <h1>Średnnia ilość bramek</h1>
+                        <h1>Średnia ilość bramek</h1>
 
 
                                     <table class="table table-borderless">

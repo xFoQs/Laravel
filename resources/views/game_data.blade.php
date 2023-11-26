@@ -138,13 +138,18 @@
                 var gameDataContainer = $('#game-data-container');
                 // Tworzymy kontener zawierający wszystkie dane meczu na podstawie odpowiedzi z serwera
                 gameDataContainer.html(`
-                    <div style="padding-top: 3rem; display: flex; align-items: center; justify-content: center;">
-                        <div class="match" style="width: 90%;">
-                            <div class="match-header">
-                                <h2 class="match-tournament">${response.league}   (${response.season})</h2>
-                                <span class="match-tournament">${response.round}</span>
-                            </div>
-                            <div class="match-content">
+        <div style="padding-top: 3rem; display: flex; align-items: center; justify-content: center;">
+            <div class="match" style="width: 90%;">
+                <div class="match-header">
+                    <h2 class="match-tournament">${response.league}   (${response.season})</h2>
+                    <span class="match-tournament">${response.round}</span>
+                </div>
+
+                <div style="width: 100%; text-align: center;">
+    <span>${response.message !== null ? `<div class="alert alert-info">${response.message}</div>` : ''}</span>
+</div>
+
+                <div class="match-content">
                                 <div class="column">
                                     <div class="team">
                                         <div class="team-logo">
@@ -172,15 +177,20 @@
                                     </div>
                                 </div>
 
-                            </div>
+
+
+                </div>
 <div class="timeline-wrapper">
-        <div class="timeline">
+<div class="timeline">
+
+</div>
+</div>
+
+
+            </div>
 
         </div>
-    </div>
-                        </div>
-                    </div>
-                `);
+`);
 
                 generateTimeline(
                     response,
@@ -246,6 +256,7 @@
                                 homeEvent.append(`<div>${event.player.name} ${event.player.surname}</div>`);
                             }
                             eventTime.text(event.minute + "'");
+                            homeEvent.append(`<div><span class="badge bg-primary">${event.message ? `(${event.message})` : ''}</span></div>`);
                         }
 
 // Sprawdzamy, czy team_id jest z drużyny po lewej (response.team1Id) czy prawej (response.team2Id)

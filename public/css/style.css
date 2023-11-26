@@ -7,7 +7,6 @@
 /*====== Formtatting ========*/
 /*===========================*/
 .verdana-gray {
-
     color: black;
     padding: 8px;
 }
@@ -16,10 +15,10 @@
 /*======= Background ========*/
 /*===========================*/
 .bg-gray {
-    background-color: #8d8d8d;
+    background-color: #3B71CA;
 }
 .bg-light-gray {
-    background-color: #e5e5e5;
+    background-color: #3B71CA;
 }
 .bg-white {
     background-color: white;
@@ -34,22 +33,24 @@
 #wrapper-main {
     display: flex;
     flex-direction: column;
-
     height: 100%;
-
     margin: 0;
     padding: 1%;
+
+
+
 }
 #wrapper-header {
     height: 120px;
     line-height: 120px;
-
     font-size: 24pt;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 #wrapper-content {
     display: flex;
     flex: 1 0 auto;
     flex-direction: column;
+
 }
 #wrapper-footer {
     display: flex;
@@ -81,6 +82,7 @@
 #content-left-pane {
     width: 15%;
     padding: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 #e-list {
     overflow-wrap: anywhere;
@@ -93,13 +95,31 @@
     margin: 10px 0;
 }
 .el-name {
-    border-bottom: 2px solid #8d8d8d;
+    border-bottom: 2px solid #ffffff;
+    color: white;
 
 }
 .el-delete {
     cursor: pointer;
     width: 20px;
     height: 20px;
+    position: relative;
+}
+
+.el-delete:hover::after {
+    content: "Usuń";
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    white-space: nowrap;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    font-size: 12px;
+    opacity: 0.9;
+    visibility: visible;
+    transform: translateX(-50%);
 }
 
 /*========== Main ===========*/
@@ -124,7 +144,7 @@
 #e-name {
 
     font-size: 10pt;
-    color: #636363;
+    color: #ffffff;
 }
 #add-entry-btn-wrapper {
     width: 100%;
@@ -139,6 +159,8 @@
     text-align: center;
     border: 2px solid black;
     border-radius: 8px;
+
+
 }
 .form-btn:hover {
     cursor: pointer;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Player;
 use App\Models\Season;
 use App\Models\PlayerSeason;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
@@ -19,9 +20,10 @@ class PlayerController extends Controller
         $players = Player::with('seasons')->get();
 
         $teams = Team::all();
+        $users = User::all();
         $seasons = Season::with('teams')->get(); // Dodane pobranie klubów dla sezonów
 
-        return view('Admin.players', ['players' => $players, 'teams' => $teams, 'seasons' => $seasons]);
+        return view('Admin.players', ['players' => $players, 'teams' => $teams, 'seasons' => $seasons,'users' => $users]);
     }
 
 

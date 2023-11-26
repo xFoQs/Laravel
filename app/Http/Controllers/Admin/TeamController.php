@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\League;
 use App\Models\Season;
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
@@ -19,9 +20,10 @@ class TeamController extends Controller
     {
         $teams = Team::all();
         $leagues = League::all();
+        $users = User::all();
         $seasons = Season::all();
 
-        return view('admin.teams', compact('teams','leagues','seasons'));
+        return view('admin.teams', compact('teams','leagues','seasons','users'));
     }
 
     public function create(): View

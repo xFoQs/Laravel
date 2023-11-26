@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\League;
 use App\Models\Season;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,8 @@ class LeagueController extends Controller
     public function index()
     {
         $leagues = League::all();
-        return view('Admin.leagues', compact('leagues'));
+        $users = User::all();
+        return view('Admin.leagues', compact('leagues','users'));
     }
 
 

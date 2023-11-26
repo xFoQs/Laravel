@@ -52,6 +52,28 @@
         }
     </style>
 
+    <style>
+        .nav-item.dropdown {
+            position: relative;
+        }
+
+        .nav-item.dropdown .dropdown-toggle {
+            cursor: pointer;
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .nav-item.dropdown .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 999;
+        }
+    </style>
+
 </head>
 
 <body id="body-pd">
@@ -61,17 +83,40 @@
         <i class='bx bx-menu' id="header-toggle"></i>
     </div>
 
+
     <div class="d-flex align-items-center justify-content-between">
-        <a href="/livegame" data-bs-toggle="tooltip" data-bs-placement="top" title="Relacja live">
+
+        <a href="/livegame" data-bs-toggle="tooltip" data-bs-placement="top" title="Relacja live" style="padding-right: 1.5rem;">
             <i class="fas fa-headset"></i>
             <span class="badge rounded-pill badge-notification bg-danger"><span id="matchCount"></span></span>
         </a>
 
+        <ul class="navbar-nav">
+            <!-- Avatar -->
+            <li class="nav-item dropdown">
+                <div class="dropdown-toggle d-flex align-items-center">
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img (31).webp" class="rounded-circle"
+                         height="22" alt="Avatar" loading="lazy" />
+                </div>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#myProfileModal">Mój Profil</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#passwordResetModal">Zmień Hasło</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('page') }}">Wyloguj</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
 
         <div class="d-flex align-items-center m-1">
             <div class="vertical-line mx-3"></div>
             <b style="padding-right: 2px;">Witaj, </b> {{ auth()->user()->name }} !
         </div>
+
     </div>
 </header>
 
@@ -120,7 +165,7 @@
                         <span class="badge bg-info">{{ $user->role->name }}</span>
                     </td>
                     <td>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editteam{{$user->id}}" title="Edycja">
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#edituser{{$user->id}}" title="Edycja">
                             <i class="fa-solid fa-pen-to-square" style="color:white;"></i>
                         </button>
 
@@ -199,41 +244,137 @@
 {{--</div>--}}
 
 
-{{--<!-- Modal -->--}}
-{{--@foreach($users as $user)--}}
-{{--    <div class="modal editteam" id="editteam{{$user->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" data-player-id="{{$user->id}}"--}}
-{{--         aria-labelledby="staticBackdropLabel" aria-hidden="true">--}}
-{{--        <div class="modal-dialog modal-dialog-centered modal-lg">--}}
-{{--            <div class="modal-content">--}}
-{{--                <div class="modal-header">--}}
-{{--                    <h5 class="modal-title" id="staticBackdropLabel">Edytuj Użytkownika</h5>--}}
-{{--                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--}}
-{{--                </div>--}}
-{{--                <div class="modal-body">--}}
-{{--                    <form class="row gx-3" method="POST" action="{{route('league.update')}}">--}}
-{{--                        @csrf--}}
-{{--                        <input type="hidden" name="id" value="{{ $league->id }}">--}}
-{{--                        <div class="col-md-12">--}}
-{{--                            <div class="col-md-12">--}}
-{{--                                <div class="form">--}}
-{{--                                    <input type="text" class="form-control" name="name"--}}
-{{--                                           value="{{$league->name}}" required placeholder="Podaj nazwę Sezonu" onchange="setCustomValidity('')" oninvalid="this.setCustomValidity('Podaj nazwę ligi')" />--}}
-{{--                                    <label for="validationCustom01" class="form-label"></label>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        <div class="col-12">--}}
-{{--                            <div class="modal-footer">--}}
-{{--                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>--}}
-{{--                                <button type="submit" id="update" value="add" class="btn btn-primary">Wyślij</button>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                        </div>--}}
-{{--                    </form>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
-{{--@endforeach--}}
+<!-- Modal -->
+@foreach($users as $user)
+    <div class="modal edituser" id="edituser{{$user->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" data-player-id="{{$user->id}}"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Edytuj Użytkownika</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="row gx-3" method="POST" action="{{ route('user.updateRole', ['id' => $user->id]) }}">
+                        @csrf
+                        <input type="hidden" name="id" value="{{ $user->id }}">
+                        <div class="col-md-4">
+                            <div class="form">
+                                <div>
+                                    <div class="mb-4 d-flex justify-content-center">
+                                        <img id="preview{{$user->id}}" src="{{ $user->photo ? asset('img/' . $user->photo) : asset('img/236831.png') }}"
+                                             alt="example placeholder" style="width: 180px; height: 200px;"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <ul class="list-group">
+                                <li class="list-group-item"><strong>Imię i Nazwisko:</strong> {{ $user->name }}<span> </span>{{ $user->surname }}</li>
+                                <li class="list-group-item"><strong>Email:</strong> {{ $user->email }}</li>
+                                <li class="list-group-item"><strong>Rola:</strong> {{ $user->role->name }}</li>
+                            </ul>
+                            <label for="role" class="form-label" style="padding-top: 2rem;"><strong>Wybierz nową rolę:</strong></label>
+                            <select name="role" id="role" class="form-select">
+                                <option value="1" {{ $user->role_id == 1 ? 'selected' : '' }}>Administrator</option>
+                                <option value="2" {{ $user->role_id == 2 ? 'selected' : '' }}>Pracownik</option>
+                            </select>
+                        </div>
+
+
+                        <div class="modal-footer mt-3">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                            <button type="submit" id="update" value="add" class="btn btn-primary">Wyślij</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
+
+
+@foreach($users as $user)
+    <div class="modal" id="myProfileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="myProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myProfileModalLabel">Mój Profil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @csrf
+                    <input type="hidden" name="id" value="{{ $user->id }}">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form">
+                                <div>
+                                    <div class="mb-4 d-flex justify-content-center">
+                                        <img id="preview{{$user->id}}" src="{{ $user->photo ? asset('img/' . $user->photo) : asset('img/236831.png') }}"
+                                             alt="example placeholder" style="width: 180px; height: 200px;"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <ul class="list-group">
+                                <li class="list-group-item"><strong>Imię i Nazwisko:</strong> {{ $user->name }}<span> </span>{{ $user->surname }}</li>
+                                <li class="list-group-item"><strong>Email:</strong> {{ $user->email }}</li>
+                                <li class="list-group-item"><strong>Rola:</strong> {{ $user->role->name }}</li>
+                            </ul>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="modal-footer">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
+
+<div class="modal fade" id="passwordResetModal" tabindex="-1" aria-labelledby="passwordResetModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="passwordResetModalLabel">Zmiana hasła</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="passwordResetForm">
+                    @csrf
+
+                    <!-- Current Password input -->
+                    <div class="mb-4">
+                        <label for="currentPassword" class="form-label">Aktualne hasło</label>
+                        <input type="password" id="currentPassword" name="current_password" class="form-control" required />
+                    </div>
+
+                    <!-- New Password input -->
+                    <div class="mb-4">
+                        <label for="newPassword" class="form-label">Nowe hasło</label>
+                        <input type="password" id="newPassword" name="new_password" class="form-control" required />
+                    </div>
+
+                    <!-- Confirm Password input -->
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="form-label">Potwierdź hasło</label>
+                        <input type="password" id="confirmPassword" name="new_password_confirmation" class="form-control" required />
+                    </div>
+
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" value="Zmień hasło">Zmień hasło</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
@@ -255,6 +396,45 @@
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const passwordResetForm = document.getElementById("passwordResetForm");
+
+        passwordResetForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(passwordResetForm);
+
+            fetch("/change-password", {
+                method: "POST",
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.password_changed) {
+                        Swal.fire({
+                            title: "Success",
+                            text: data.message,
+                            icon: "success",
+                        });
+
+                        passwordResetForm.reset();
+                    } else if (data.password_error) {
+                        Swal.fire({
+                            title: "Error",
+                            text: data.message,
+                            icon: "error",
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        });
+    });
+</script>
 
 <script>
     // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -324,7 +504,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "{{ route('leagues.delete')}}",
+                    url: "{{ route('users.delete')}}",
                     type: "GET",
                     dataType: 'json',
                     data: {
@@ -332,7 +512,7 @@
                     },
                     success: function(response) {
                         Swal.fire({
-                            title: "Liga została usunięta!",
+                            title: "Użytkownik został usunięty!",
                             text: "Naciśnij przycisk aby przeładować stronę",
                             icon: "success",
                             showConfirmButton: true
@@ -341,7 +521,7 @@
                         });
                     },
                     error: function(error) {
-                        Swal.fire('Nie udało sie usunąć ligi!', '', 'error');
+                        Swal.fire('Nie udało sie usunąć użytkownika!', '', 'error');
                     },
                 })
             }
