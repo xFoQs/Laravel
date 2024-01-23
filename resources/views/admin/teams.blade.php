@@ -613,35 +613,35 @@
                     extend: 'copyHtml5',
                     text: 'Kopiuj', // Zmienione "Copy" na "Kopiuj"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4]
+                        columns: [0, 1, 2]
                     }
                 },
                 {
                     extend: 'csvHtml5',
                     text: 'CSV', // Zmienione "CSV" na "CSV"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4]
+                        columns: [0, 1, 2]
                     }
                 },
                 {
                     extend: 'excelHtml5',
                     text: 'Excel', // Zmienione "Excel" na "Excel"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4]
+                        columns: [0, 1, 2]
                     }
                 },
                 {
                     extend: 'pdfHtml5',
                     text: 'PDF', // Zmienione "Pdf" na "Pdf"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4]
+                        columns: [0, 1, 2]
                     }
                 },
                 {
                     extend: 'print',
                     text: 'Drukuj', // Zmienione "Print" na "Drukuj"
                     exportOptions: {
-                        columns: [0, 1, 2, 3, 4]
+                        columns: [0, 1, 2]
                     }
                 }
             ],
