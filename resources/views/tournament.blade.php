@@ -210,7 +210,7 @@
     <div id="footer" class="verdana-gray">
         <div id="link-wrapper">
             <!-- Add the download button here -->
-            <div id="download-btn" onclick="downloadBracket()">Download Bracket (PDF)</div>
+            <div id="download-btn" onclick="downloadBracket()">Pobierz drabinkę</div>
         </div>
     </div>
 </div>
