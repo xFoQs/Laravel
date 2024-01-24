@@ -194,8 +194,8 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @if ($commonResults && count($commonResults) > 0)
-                                        @foreach ($chunkedResults[0] as $result)
+                                    @if ($commonResults && count($commonResults) > 1)
+                                        @foreach ($chunkedResults[1] as $result)
                                             <tr>
                                                 <td>{{ $result['result'] }}</td>
                                                 <td>{{ $result['count'] }}</td>

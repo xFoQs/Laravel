@@ -239,14 +239,16 @@ class StatisticsController extends Controller
     public function calculateGoallessMatches($results)
     {
         $goallessMatches = $results->filter(function ($game) {
-            return $game->result1 === 0 && $game->result2 === 0;
+            return $game->result1 !== null && $game->result2 !== null && $game->result1 === 0 && $game->result2 === 0;
         });
 
-        $goallessMatchesCount = $results->filter(function ($game) {
-            return $game->result1 === 0 && $game->result2 === 0;
-        })->count();
+        $goallessMatchesCount = $goallessMatches->count();
 
-        $goallessMatchesPercentage = $results->count() > 0 ? ($goallessMatchesCount / $results->count()) * 100 : 0;
+        $filteredResults = $results->filter(function ($game) {
+            return $game->result1 !== null && $game->result2 !== null;
+        });
+
+        $goallessMatchesPercentage = $filteredResults->count() > 0 ? ($goallessMatchesCount / $filteredResults->count()) * 100 : 0;
 
         return [
             'count' => $goallessMatchesCount,
@@ -257,12 +259,19 @@ class StatisticsController extends Controller
     public function calculateWinByAtLeastOneGoal($results)
     {
         $winByAtLeastOneGoal = $results->filter(function ($game) {
-            return ($game->result1 > $game->result2 && $game->result2 === 0) || ($game->result2 > $game->result1 && $game->result1 === 0);
+            return $game->result1 !== null && $game->result2 !== null &&
+                (($game->result1 > $game->result2 && $game->result1 - $game->result2 >= 1) ||
+                    ($game->result2 > $game->result1 && $game->result2 - $game->result1 >= 1));
         });
 
         $winByAtLeastOneGoalCount = $winByAtLeastOneGoal->count();
 
-        $winByAtLeastOneGoalPercentage = $results->count() > 0 ? ($winByAtLeastOneGoalCount / $results->count()) * 100 : 0;
+        $filteredResults = $results->filter(function ($game) {
+            return $game->result1 !== null && $game->result2 !== null;
+        });
+
+        $winByAtLeastOneGoalPercentage = $filteredResults->count() > 0 ?
+            ($winByAtLeastOneGoalCount / $filteredResults->count()) * 100 : 0;
 
         return [
             'count' => $winByAtLeastOneGoalCount,
@@ -273,12 +282,19 @@ class StatisticsController extends Controller
     public function calculateWinByAtLeastTwoGoals($results)
     {
         $winByAtLeastTwoGoals = $results->filter(function ($game) {
-            return ($game->result1 > $game->result2 && $game->result1 - $game->result2 >= 2) || ($game->result2 > $game->result1 && $game->result2 - $game->result1 >= 2);
+            return $game->result1 !== null && $game->result2 !== null &&
+                (($game->result1 > $game->result2 && $game->result1 - $game->result2 >= 2) ||
+                    ($game->result2 > $game->result1 && $game->result2 - $game->result1 >= 2));
         });
 
         $winByAtLeastTwoGoalsCount = $winByAtLeastTwoGoals->count();
 
-        $winByAtLeastTwoGoalsPercentage = $results->count() > 0 ? ($winByAtLeastTwoGoalsCount / $results->count()) * 100 : 0;
+        $filteredResults = $results->filter(function ($game) {
+            return $game->result1 !== null && $game->result2 !== null;
+        });
+
+        $winByAtLeastTwoGoalsPercentage = $filteredResults->count() > 0 ?
+            ($winByAtLeastTwoGoalsCount / $filteredResults->count()) * 100 : 0;
 
         return [
             'count' => $winByAtLeastTwoGoalsCount,
@@ -289,12 +305,19 @@ class StatisticsController extends Controller
     public function calculateWinByThreeOrMoreGoals($results)
     {
         $winByThreeOrMoreGoals = $results->filter(function ($game) {
-            return ($game->result1 > $game->result2 && $game->result1 - $game->result2 >= 3) || ($game->result2 > $game->result1 && $game->result2 - $game->result1 >= 3);
+            return $game->result1 !== null && $game->result2 !== null &&
+                (($game->result1 > $game->result2 && $game->result1 - $game->result2 >= 3) ||
+                    ($game->result2 > $game->result1 && $game->result2 - $game->result1 >= 3));
         });
 
         $winByThreeOrMoreGoalsCount = $winByThreeOrMoreGoals->count();
 
-        $winByThreeOrMoreGoalsPercentage = $results->count() > 0 ? ($winByThreeOrMoreGoalsCount / $results->count()) * 100 : 0;
+        $filteredResults = $results->filter(function ($game) {
+            return $game->result1 !== null && $game->result2 !== null;
+        });
+
+        $winByThreeOrMoreGoalsPercentage = $filteredResults->count() > 0 ?
+            ($winByThreeOrMoreGoalsCount / $filteredResults->count()) * 100 : 0;
 
         return [
             'count' => $winByThreeOrMoreGoalsCount,
